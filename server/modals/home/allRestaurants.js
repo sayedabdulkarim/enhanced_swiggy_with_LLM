@@ -59,7 +59,7 @@ const restaurantSchema = new Schema({
   adminUserId: {
     type: mongoose.Types.ObjectId,
     ref: "AdminUser", // assuming 'AdminUser' is your admin user model name
-    required: true,
+    required: false, // Change to false to make it optional
   },
 });
 

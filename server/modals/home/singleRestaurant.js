@@ -26,28 +26,38 @@ const OfferSchema = new mongoose.Schema({
 });
 //offerSchema end
 
-const ItemSchema = new mongoose.Schema({
-  // id: String,
-  name: { type: String, required: true },
-  description: String,
-  imageId: String,
-  inStock: Boolean,
-  price: Number,
-  variants: [{}],
-  attributes: {
-    vegClassifier: String,
+const ItemSchema = new mongoose.Schema(
+  {
+    id: { type: String },
+    name: { type: String, required: true },
+    description: String,
+    imageId: String,
+    inStock: Boolean,
+    price: Number,
+    variants: [{}],
+    variantsV2: {},
+    itemAttribute: {
+      vegClassifier: String,
+    },
+    ribbon: {},
+    type: String,
+    itemBadge: {},
+    badgesV2: {},
+    ratings: {
+      aggregatedRating: {
+        rating: String,
+        ratingCount: String,
+        ratingCountV2: String,
+      },
+    },
+    offers: [OfferSchema],
   },
-  ratings: {
-    rating: Number,
-    ratingCount: Number,
-  },
-  offers: [OfferSchema],
-});
+  { _id: false }
+); // Prevent Mongoose from adding an _id field to each item
 
 const MenuCategorySchema = new mongoose.Schema({
   categoryName: { type: String, required: true },
-  // items: [{ type: ItemSchema, _id: false }],
-  items: [{ type: ItemSchema }],
+  items: [ItemSchema],
 });
 
 const RestaurantDetails = new mongoose.Schema({
