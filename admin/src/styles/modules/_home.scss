@@ -1,0 +1,362 @@
+.home_container {
+    // border: 1px solid green;
+    margin-left: calc(10% + 36px);
+    margin-right: calc(10% + 36px);
+    //add restaurant
+
+    .add_restaurant_btn_container {
+        height: 100vh;
+        width: 100%;
+        position: relative;
+        // border: 1px solid red;
+
+        .wrapper {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            // text-align: center;
+
+            >div {
+
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-direction: column;
+
+                h2 {
+                    font-size: 24px;
+                }
+
+                a {
+
+                    text-decoration: none;
+
+                    button {
+                        //
+                        padding: 10px;
+                        background-color: rgb(228, 115, 78);
+                        cursor: pointer;
+                        // background-color: rgb(212, 213, 217);
+                        height: 46px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        border-radius: 5px;
+                        margin-top: 30px;
+                        // width: 100%;
+                        outline: none;
+                        border: none;
+                        font-size: 14px;
+                        line-height: 22px;
+                        text-align: center;
+                        color: rgb(255, 255, 255);
+                    }
+                }
+            }
+
+        }
+
+    }
+
+    // restaurant details
+    .restaurant_detail_container {
+        // border: 1px solid red;
+        margin-top: 100px;
+        margin-left: calc(10% + 36px);
+        margin-right: calc(10% + 36px);
+
+        .title {
+            margin: 20px 0;
+            -webkit-font-smoothing: antialiased;
+            font-size: 32px;
+            font-weight: 800;
+            line-height: 28px;
+            letter-spacing: -0.4px;
+            color: rgba(2, 6, 12, 0.92);
+            overflow: hidden;
+            width: 100%;
+            display: -webkit-box;
+            overflow-wrap: break-word;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .wrapper {
+            display: flex;
+            gap: 20px;
+
+            .left_section,
+            .right_section {
+                width: 100%;
+                box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+                transition: 0.3s;
+                padding: 16px;
+            }
+
+            .left_section:hover,
+            .right_section:hover {
+                box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+            }
+
+            .right_section {
+
+                // > p {
+                // }
+                .item {
+                    margin: 15px 0;
+                }
+            }
+
+            .restaurant_image {
+                width: 100%;
+                height: 250px;
+                background-size: cover;
+                background-position: center;
+                border-radius: 8px;
+                object-fit: cover;
+                /* Add this to maintain aspect ratio */
+            }
+
+            .keyName {
+                margin: 0px 0 10px 0;
+                -webkit-font-smoothing: antialiased;
+                font-size: 18px;
+                font-weight: 700;
+                line-height: 24px;
+                letter-spacing: -0.3px;
+                color: rgba(2, 6, 12, 0.75);
+                overflow: hidden;
+                width: 100%;
+                // display: -webkit-box;
+                overflow-wrap: break-word;
+                -webkit-line-clamp: 1;
+                -webkit-box-orient: vertical;
+            }
+
+            .smallKeyName {
+                margin: 0px;
+                -webkit-font-smoothing: antialiased;
+                font-size: 16px;
+                font-weight: 700;
+                line-height: 24px;
+                letter-spacing: -0.3px;
+                color: rgba(2, 6, 12, 0.75);
+                overflow: hidden;
+                width: 100%;
+                // display: -webkit-box;
+                overflow-wrap: break-word;
+                -webkit-line-clamp: 1;
+                -webkit-box-orient: vertical;
+            }
+
+        }
+
+    }
+
+
+    .add_menu_container {
+        margin-left: calc(10% + 36px);
+        margin-right: calc(10% + 36px);
+
+        h4 {
+            margin: 20px 0;
+            -webkit-font-smoothing: antialiased;
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: -0.4px;
+            color: rgba(2, 6, 12, 0.92);
+            width: 100%;
+        }
+
+        button {
+            background-color: rgb(228, 115, 78);
+            cursor: pointer;
+            height: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            margin-top: 30px;
+            width: 30%;
+            outline: none;
+            border: none;
+            //
+            font-size: 18px;
+            line-height: 22px;
+            text-align: center;
+            color: rgb(255, 255, 255);
+        }
+
+    }
+
+
+    .prod_accordion {
+        border: 1px solid red;
+        padding-bottom: 16px;
+
+        .accordion_item {
+            .item_title {
+                .icon-downArrow  {
+                    font-family: icomoon;
+                    speak: none;
+                    font-style: normal;
+                    font-weight: 400;
+                    font-variant: normal;
+                    text-transform: none;
+                    line-height: 1;
+                    -webkit-font-smoothing: antialiased;
+
+                    &::before {
+                        content: "\e923";
+                    }
+                }
+            }
+
+            .main_border {
+                height: 16px;
+                border-bottom: 16px solid #f1f1f6;
+            }
+        }
+    }
+
+    .menu_list_container {
+        margin-bottom: 50px;
+        > h2 {
+            margin: 20px 0;
+            -webkit-font-smoothing: antialiased;
+            font-size: 32px;
+            font-weight: 800;
+            line-height: 28px;
+            letter-spacing: -0.4px;
+            color: rgba(2, 6, 12, 0.92);
+            overflow: hidden;
+            width: 100%;
+            display: -webkit-box;
+            overflow-wrap: break-word;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .stock_update_button {
+            background-color: rgb(228, 115, 78);
+            cursor: pointer;
+            height: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            margin-top: 30px;
+            // width: 30%;
+            outline: none;
+            border: none;
+            font-size: 18px;
+            line-height: 22px;
+            text-align: center;
+            color: rgb(255, 255, 255);
+        }
+    }
+    
+    .order_list_container {
+        // border: 1px solid red;
+        margin-bottom: 100px;
+
+        .order_listing_wrapper {
+            > h2 {
+                margin: 0 0 20px 0;
+                -webkit-font-smoothing: antialiased;
+                font-size: 32px;
+                font-weight: 800;
+                line-height: normal;
+                letter-spacing: -0.4px;
+                color: rgba(2, 6, 12, 0.92);
+                overflow: hidden;
+                width: 100%;
+                display: -webkit-box;
+                overflow-wrap: break-word;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+            }
+
+            ul {
+                li {
+                    background-color: #F0F0F0;
+                    border: 1px solid #d9d9d9;
+                    margin-bottom: 10px;
+                    padding: 20px;
+                    border-radius: 4px;
+                    display: flex;
+                    justify-content: space-between;
+                    width: 100%;
+                    .left_section {
+                        width: 60%;
+
+                        .count {
+                            .name {
+                                font-size: 16px;
+                                font-weight: 600;
+                                color: #3d4152;
+                                display: inline-block;
+                                cursor: pointer;
+                            }
+                        }
+                        
+                        .address_det {
+                            margin-top: 10px;
+                            .title {
+                                font-size: 14px;
+                                font-weight: 600;
+                                color: #3d4152;
+                                display: inline-block;
+                                cursor: pointer;
+
+                            }
+
+                            .address_description {
+                                margin-top: 6px;
+                                color: #7e808c;
+                                font-size: 12px;
+                                .landmark {}
+                                .address_txt {}
+                            }
+                        }
+                    }
+                    .right_section {
+                        flex: 1;
+
+                        > div {
+                            text-align: right;
+                        }
+
+                        button {
+                            background-color: rgb(228, 115, 78);
+                            cursor: pointer;
+                            height: 46px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            border-radius: 5px;
+                            margin-top: 30px;
+                            outline: none;
+                            border: none;
+                            font-size: 18px;
+                            line-height: 22px;
+                            text-align: center;
+                            color: rgb(255, 255, 255);
+                            float: right;
+                        }
+                    }
+
+                    .address_det {
+
+                    }
+
+                }
+            }
+        }
+        
+        .empty_order_wrapper {}
+    
+    }
+
+}

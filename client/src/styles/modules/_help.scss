@@ -1,0 +1,137 @@
+.help_page_container {
+
+    background: #36718F;
+    border: 1px solid #36718F;
+
+    .Helptop {
+
+        // width: 95%;
+        // margin: 0px auto;
+
+        .Helptoptext {
+            width: 95%;
+            margin: 20px auto;
+            color: white;
+
+            >div {
+                font-size: 1.8rem;
+                font-weight: 600;
+                text-transform: capitalize;
+            }
+
+            >p {
+                font-size: 1rem
+            }
+        }
+
+        .Accordianmenu {
+
+            background: white;
+            box-sizing: border-box;
+
+            .Accordian {
+
+                width: 95%;
+                margin: 0 auto;
+                box-sizing: border-box;
+                display: flex;
+                justify-content: space-between;
+                margin: 35px;
+
+                >h3 {
+                    font-size: 1.5rem
+                }
+
+                //left
+                .AccordianBtn {
+
+                    width: 30%;
+
+                    ul {
+
+                        list-style: none;
+                        background: #EDF1F7;
+                        box-sizing: border-box;
+
+                        li {
+
+                            line-height: 50px;
+                            background: #fff;
+                            margin: 15px 0 15px 15px;
+                            box-sizing: border-box;
+                            padding: 10px;
+                            /* cursor: pointer; */
+                            font-size: 1rem;
+
+                            &:active {
+                                background-color: #edf1f7;
+                            }
+
+                            .Nav_link:active {
+                                color: red;
+                            }
+
+                            a {
+                                text-decoration: none;
+                                color: black
+                            }
+
+                        }
+
+                    }
+
+                }
+
+                //right
+                .Accordianpage {
+                    width: 65%;
+
+                    .common_section {
+                        margin: 35px;
+
+                        .One {
+
+                            cursor: pointer;
+                            width: 100%;
+                            margin: 10px 0;
+                            padding: 5px;
+                            box-sizing: border-box;
+                            border-bottom: 1px solid #D4D5D9;
+
+                            p {
+                                font-size: 0.8rem
+                            }
+
+                            .Accordianitem {
+                                display: flex;
+                                padding: 15px 0;
+                                box-sizing: border-box;
+                                justify-content: space-between;
+
+                                i {
+                                    color: #D4D5D9;
+                                    font-size: 1rem
+                                }
+
+                                h4 {
+
+                                    font-weight: lighter;
+                                    font-size: 1rem;
+
+                                    &:hover {
+
+                                        color: #fc8019;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
+}

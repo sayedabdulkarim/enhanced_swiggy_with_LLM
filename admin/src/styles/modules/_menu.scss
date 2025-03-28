@@ -1,0 +1,44 @@
+.menu_form_container {
+        // border: 1px solid green;
+        margin-left: calc(10% + 36px);
+        margin-right: calc(10% + 36px);
+        margin-top: 100px;
+
+        .title {
+            font-size: 22px;
+            margin-bottom: 20px;
+            
+            span {
+                margin: 0px;
+                -webkit-font-smoothing: antialiased;
+                font-weight: 700;
+                line-height: 24px;
+                letter-spacing: -0.3px;
+                color: rgba(2, 6, 12, 0.75);
+                overflow: hidden;
+                width: 100%;
+                overflow-wrap: break-word;
+                -webkit-line-clamp: 1;
+                -webkit-box-orient: vertical;
+            }
+
+        }
+
+        .submit_btn {
+            background-color: rgb(228, 115, 78);
+            cursor: pointer;
+            height: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            margin-top: 30px;
+            width: 30%;
+            outline: none;
+            border: none;
+            font-size: 18px;
+            line-height: 22px;
+            text-align: center;
+            color: rgb(255, 255, 255);
+        }
+}

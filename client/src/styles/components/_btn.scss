@@ -1,0 +1,106 @@
+@import "../base/variables";
+
+%btn {
+    font-family: $LeagueGothic;
+    color: $whiteColor;
+    text-transform: uppercase;
+    font-size: em(24px);
+    padding: 20px 40px;
+    display: inline-block;
+    border: 0px;
+    cursor: pointer;
+    font-weight: 500;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+    letter-spacing: 0.6px;
+    &:hover {
+        background-color: $redColor;
+    }
+    i {
+        margin: 0 0 0 8px;
+        vertical-align: middle;
+        font-style: normal;
+    }
+}
+.btn-primary {
+    @extend %btn;
+    background-color: $redColor;
+    .fa {
+        margin-right: 5px;
+    }
+    &:hover {
+        background-color: $redColor;
+        color: $whiteColor;
+    }
+}
+.btn-white {
+    @extend %btn;
+    background-color: $whiteColor;
+    color: $primaryColor;
+    .fa {
+        margin-right: 5px;
+    }
+    &:hover {
+        background-color: $redColor;
+        color: $whiteColor;
+    }
+}
+.btn-white-border {
+    @extend %btn;
+    background-color: transparent;
+    color: $whiteColor;
+    border: solid 2px $whiteColor;
+    letter-spacing: 1.32px;
+    .fa {
+        margin-right: 5px;
+    }
+    &:hover {
+        background-color: $redColor;
+        color: $whiteColor;
+    }
+}
+.btn-light-red-border {
+    @extend %btn;
+    background-color: transparent;
+    // color: $whiteColor;
+    color: $redColor;
+    border: solid 2px $redColor;
+    letter-spacing: 1.32px;
+    .fa {
+        margin-right: 5px;
+    }
+    &:hover {
+        background-color: $redColor;
+        color: $whiteColor;
+    }
+}
+.gray-button {
+    @extend %btn;
+    background-color: $grayColor;
+    font-size: em(13px);
+    color: $blackColor;
+    .fa {
+        margin-right: 5px;
+    }
+    &:hover {
+        background-color: $grayColor;
+        color: $whiteColor;
+    }
+}
+.creame-button {
+    @extend %btn;
+    background-color: $whiteColor;
+    font-size: em(13px);
+    color: $redColor;
+    .fa {
+        margin-right: 5px;
+    }
+}
+.disabled {
+    color: $whiteColor;
+    background-color: $grayColor;
+    border-color: $grayColor;
+    pointer-events: none;
+    opacity: 0.65;
+}

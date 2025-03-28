@@ -1,0 +1,723 @@
+.order_component {
+
+    .order_container {
+
+        // padding: 0 20px;
+        background: #37718e;
+        min-height: 100vh;
+
+        .order_container_header {
+            position: relative;
+            padding-top: 33px;
+            max-width: 1200px;
+            min-width: 1200px;
+            margin: 0 auto;
+
+            .order_container_wrapper {
+
+                color: #fff;
+                margin-bottom: 37px;
+                margin-top: 37px;
+                position: relative;
+
+                .edit_profile {
+                    float: right;
+                    position: absolute;
+                    bottom: 7px;
+                    right: 0;
+                    border: 1px solid hsla(0, 0%, 100%, .6);
+                    padding: 12px 20px;
+                    text-transform: uppercase;
+                    display: inline-block;
+                    font-size: 14px;
+                    font-weight: 600;
+                    cursor: pointer;
+                }
+
+                .userName {
+                    font-size: 32px;
+                    font-weight: 600;
+                    text-transform: capitalize;
+                }
+
+                .contact {
+                    margin-top: 2px;
+                    font-size: 16px;
+
+                    .phone {}
+
+                    .email {
+                        margin-left: 15px;
+                    }
+                }
+            }
+
+        }
+
+        // 
+        .order_container_content {
+            background: #fff;
+            contain: layout;
+            box-shadow: 0 2px 15px 0 rgba(0, 0, 0, .15);
+            width: 1300px;
+            margin: 0 auto;
+            position: relative;
+
+            .order_container_wrapper {
+
+                max-width: 1200px;
+                min-width: 1200px;
+                position: relative;
+                margin: 0 auto;
+                contain: layout;
+                padding-top: 50px !important;
+                padding-bottom: 50px !important;
+
+                .order_container {
+                    display: flex;
+
+                    .left_section {
+                        min-width: 260px;
+                        background: #edf1f7;
+
+                        ul {
+
+                            padding: 20px 0;
+                            position: sticky;
+                            // position: -webkit-sticky;
+                            top: 80px;
+                            margin: 0;
+                            // padding: 0;
+                            list-style-type: none;
+
+                            .item {
+                                padding: 25px 20px;
+                                margin-left: 20px;
+                                cursor: pointer;
+                                display: flex;
+                                position: relative;
+
+                                &.isActive {
+                                    background: #fff;
+                                }
+
+                                .icon {
+                                    font-size: 25px;
+                                    position: absolute;
+                                    top: 23px;
+
+                                    &::before {
+                                        content: "\E919";
+                                    }
+
+                                    &.isActive {
+                                        // color: #282c3f;    
+                                    }
+                                }
+
+                                .title {}
+                            }
+                        }
+                    }
+
+                    .right_section {
+                        // border: 1px solid red;
+                        width: 100%;
+
+                        .order_details_component {
+                            flex: 1;
+                            background: #fff;
+                            padding: 37px 0 0 50px;
+                            position: relative;
+                            // min-height: 80vh;
+                            height: 100%;
+
+                            .title {
+                                font-size: 24px;
+                                font-weight: 600;
+                            }
+
+                            .order_detail_item {
+                                border: 1px solid #d4d5d9;
+                                padding: 30px;
+                                margin: 24px 0 37px;
+
+                                .item_top {
+                                    padding-bottom: 20px;
+                                    background-image: linear-gradient(90deg, #a9abb2 25%, hsla(0, 0%, 100%, 0) 0);
+                                    background-position: bottom;
+                                    background-size: 4px 1px;
+                                    background-repeat: repeat-x;
+                                    display: flex;
+
+                                    .item_top_image {
+
+                                        background: rgba(40, 44, 63, 0.05);
+                                        width: 150px;
+                                        height: 100px;
+                                        cursor: pointer;
+
+                                        img {
+                                            height: 100px;
+                                            max-width: 100%;
+                                        }
+
+                                    }
+
+                                    .item_top_restaurant_details {
+                                        flex: 1 1;
+                                        position: relative;
+                                        padding-left: 18px;
+
+                                        .title {
+                                            font-size: 24px;
+                                            font-weight: 600;
+                                            color: #3d4152;
+                                            display: inline-block;
+                                            cursor: pointer;
+                                        }
+
+                                        .sub_title {
+                                            font-size: 13px;
+                                            color: #686b78;
+                                            text-transform: capitalize;
+                                            margin-top: 3px;
+                                        }
+
+                                        .order_date {
+                                            margin-top: 6px;
+                                            color: #7e808c;
+                                            font-size: 12px;
+                                        }
+
+                                        .view-details {
+                                            margin-top: 14px;
+                                            color: #fc8019;
+                                            font-size: 14px;
+                                            font-weight: 600;
+                                            cursor: pointer;
+                                            letter-spacing: -0.3px;
+                                            display: inline-block;
+                                        }
+                                    }
+                                }
+
+                                .item_bottom {
+                                    padding-top: 20px;
+                                    position: relative;
+
+                                    .item_count {
+
+                                        font-size: 15px;
+                                        padding-right: 240px;
+                                        color: #282c3f;
+                                        line-height: 20px;
+                                    }
+
+                                    .reorder {
+
+                                        display: flex;
+
+                                        button {
+
+                                            width: 120px;
+                                            display: inline-block;
+                                            text-align: center;
+                                            cursor: pointer;
+                                            font-size: 14px;
+                                            font-weight: 600;
+                                            margin-right: 20px;
+                                            line-height: 40px;
+                                            height: 40px;
+                                            color: #fc8019;
+                                            border: 1px solid #fc8019;
+                                            padding: 0 15px;
+                                            margin-top: 20px;
+                                            position: relative;
+
+
+                                            &.isActive {
+                                                background: #fc8019;
+                                                color: #fff;
+                                            }
+
+                                        }
+
+                                    }
+
+                                    .payment {
+
+                                        float: right;
+                                        position: absolute;
+                                        top: 22px;
+                                        right: 0;
+                                        color: #535665;
+                                        font-size: 14px;
+
+                                        span {
+                                            // border: 1px solid red;
+
+                                            &::before {
+                                                content: "\20B9";
+                                            }
+                                        }
+                                    }
+                                }
+
+                            }
+
+                            .showMore {
+                                padding: 30px;
+                                text-align: center;
+                                text-transform: uppercase;
+                                border: 1px solid #d4d5d9;
+                                font-size: 15px;
+                                font-weight: 600;
+                                color: #3d4152;
+                                cursor: pointer;
+
+                                &:hover {
+                                    box-shadow: 0 4px 14px #d4d5d9
+                                }
+                            }
+                        }
+
+                        .swiggy_one_component {
+                            // border: 1px solid red;
+                            height: 100%;
+                            background: #fff;
+                            padding: 37px 0 0 50px;
+                            position: relative;
+                            min-height: 80vh;
+
+                            .swiggy_one_container {
+                                display: flex;
+                                justify-content: space-between;
+                                .swiggy_left_wrapper {
+                                    margin-right: 360px;
+
+                                    .text {
+                                        font-style: normal;
+                                        font-weight: 700;
+                                        font-size: 1.5rem;
+                                        color: #282c3f;
+                                    }
+
+                                    .desc {
+                                        margin: 20px 0;
+                                        font-size: 18px;
+                                        line-height: 42px;
+                                        color: #686b78;
+                                        position: relative;
+                                        z-index: 1;
+                                    }
+
+                                    .download_section {
+                                        display: flex;
+                                        a {
+
+                                            &:first-child {
+                                                margin-right: 20px;
+                                            }
+
+                                            img {
+                                                border-style: none;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                .right_image {
+                                    display: flex;
+                                    width: 360px;
+                                    height: 330px;
+                                    position: absolute;
+                                    right: 0;
+                                    z-index: 0;
+                                }
+
+                            }
+                        }
+
+                        .setting_component {
+                            // border: 1px solid red;
+                            flex: 1 1;
+                            background: #fff;
+                            padding: 37px 0 0 50px;
+                            position: relative;
+                            min-height: 80vh;
+                            height: 100%;
+
+                            .title {
+                                font-size: 24px;
+                                font-weight: 600;
+                            }
+
+                            .setting_component_container {
+
+                                display: flex;
+                                flex-direction: column;
+                                margin-top: 35px;
+
+                                .desc {
+                                    padding: 16px;
+                                    margin-bottom: 16px;
+                                    border: 1px solid #d4d5d9;
+                                    color: #686b78;
+                                    font-size: 14px;
+                                    width: 100%;
+                                }
+
+                                .recommendation {
+                                    display: flex;
+                                    flex-direction: row;
+                                    justify-content: flex-start;
+                                    align-items: center;
+                                    padding: 16px;
+                                    margin-bottom: 16px;
+                                    border: 1px solid #d4d5d9;
+                                    color: #686b78;
+                                    font-size: 14px;
+
+                                    .text{
+                                        font-size: 16px;
+                                        font-weight: 600;
+                                        color: #282c3f;
+                                        margin-right: 16px;
+                                    }
+
+                                    .switch_container {
+                                        padding: 0 16px;
+
+                                        .custom_setting_switch.ant-switch-checked .ant-switch-handle:before {
+                                            background-color: #e46d47 !important;
+                                          }
+                                          
+                                          .custom_setting_switch.ant-switch-checked {
+                                            background-color: #e46d47 !important;
+                                        
+                                            .ant-switch-handle {
+                                                &::before {
+                                                    background-color: #fff!important;
+                                                }
+                                            }
+                                        }
+
+                                    }
+
+                                    .divider {
+                                        flex: 0 0 1px;
+                                        margin: 0 16px;
+                                        width: 1px;
+                                        height: 60px;
+                                        border-right: 1px solid #d4d5d9;
+                                    }
+                                    
+                                    .desc {
+                                        flex: 0.8 1;
+                                        margin-left: 8px;
+                                    }
+                                }
+                            }
+
+                              
+                        }
+
+                        .address_component {
+                            // border: 1px solid red;
+                            flex: 1 1;
+                            background: #fff;
+                            padding: 37px 0 0 50px;
+                            position: relative;
+                            min-height: 80vh;
+
+                            .title {
+                                font-size: 24px;
+                                font-weight: 600;
+                            }
+
+                            .address_container_items {
+                                display: flex;
+                                margin-top: 35px;
+
+                                .item {
+
+                                    border: 1px solid #d4d5d9;
+                                    padding: 20px;
+                                    position: relative;
+                                    width: 400px;
+                                    display: inline-block;
+                                    color: #3d4152;
+                                    display: flex;
+
+                                    &:nth-child(2n) {
+                                        margin-left: 35px;
+                                    }
+
+                                    .item_icon {
+                                        padding-right: 20px;
+                                        padding-top: 3px;
+                                        font-size: 20px;
+                                    }
+
+                                    .item_desc {
+                                        .type {
+                                            font-size: 17px;
+                                            font-weight: 600;
+                                            text-transform: capitalize;
+                                            margin-top: 3px;
+                                        }
+
+                                        .address {
+                                            font-size: 13px;
+                                            color: #535665;
+                                            line-height: 20px;
+                                            margin-top: 2px;
+                                        }
+
+                                        .btn_container {
+                                            margin-top: 11px;
+
+                                            span {
+                                                color: #fc8019;
+                                                font-weight: 600;
+                                                font-size: 14px;
+                                                margin-right: 20px;
+                                                cursor: pointer;
+                                                letter-spacing: -0.3px;
+                                            }
+                                        }
+                                    }
+                                }
+
+                            }
+                        }
+
+                    }
+
+                }
+            }
+        }
+
+    }
+
+}
+
+.order_details_custom_drawer {
+
+    .ant-drawer-title {
+        // margin-left: 30px;
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #282c3f;
+        line-height: 1.2rem;
+
+    }
+
+    .location_details {
+        // border: 1px solid red;
+
+        .location_details_container {
+
+            margin-top: 0;
+
+            .restaurant_name {
+
+                margin-bottom: 22px;
+                display: flex;
+                position: relative;
+
+                &::before {
+                    content: "";
+                    position: absolute;
+                    height: 27px;
+                    border-right: 1px dashed #a9abb2;
+                    top: 33px;
+                    left: 9px;
+                }
+
+                .icon_container {
+
+                    font-size: 25px;
+                    padding-right: 20px;
+                    align-self: center;
+
+                    .icon-location {}
+                }
+
+                .restaurant_title {
+                    font-size: 17px;
+                    font-weight: 500;
+                    overflow: hidden;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                    width: 325px;
+                }
+
+                .area_name {
+                    font-size: 12px;
+                    color: #7e808c;
+                }
+            }
+
+            .restaurant_address_container {
+
+                margin-bottom: 22px;
+                display: flex;
+                position: relative;
+
+
+                .icon_container {
+                    font-size: 25px;
+                    padding-right: 20px;
+                    align-self: center;
+                    .icon-location {}
+                }
+
+                .detail_container {
+                    .address_type {
+                        font-size: 17px;
+                        font-weight: 500;
+                        overflow: hidden;
+                        white-space: nowrap;
+                        text-overflow: ellipsis;
+                        width: 325px;
+                    }
+                    .address_det {
+                        font-size: 12px;
+                        color: #7e808c;
+                    }
+                }
+
+            }
+        }
+
+        .divider {
+            position: relative;
+            border-bottom: 1px solid #e9e9eb;
+            left: 10%;
+            width: 90%;
+            margin-bottom: 18px;
+        }
+
+    }
+
+    .item_details {
+        // border: 1px solid green;
+        padding-left: 40px;
+
+        .item_details_product {
+            padding-top: 28px;
+            padding-bottom: 3px;
+            border-top: 1px solid #000;
+            background-image: linear-gradient(90deg, #a9abb2 25%, hsla(0, 0%, 100%, 0) 0);
+            background-position: bottom;
+            background-size: 4px 1px;
+            background-repeat: repeat-x;
+
+            .count {
+                color: #7e808c;
+                padding-bottom: 8px;
+                font-size: 12px;
+            }
+            
+            .desc_price {
+                display: flex;
+                margin-bottom: 15px;
+                
+                .desc {
+                    flex-grow: 1;
+                    font-size: 13px;
+                    font-weight: 500;
+                    position: relative;
+
+                    .icon-NonVeg {
+                        font-size: 8px;
+                        line-height: 1 !important;
+                        position: absolute;
+                        left: -20px;
+                        top: 2px;
+
+                        &::before {
+                            content: "\e998";
+                        }
+                    }
+                
+                }
+                .price {
+                    color: #686b78;
+                    font-size: 13px;
+                    
+                    &::before {
+                        content: "₹";
+                        padding-right: 2px;
+                    }
+                }
+            }
+        }
+    
+        .price_description {
+            padding-top: 18px;
+            padding-bottom: 11px;
+            
+            .price_description_item {
+                .price_description_item_container {
+                    margin-bottom: 10px;
+                    color: #7e808c;
+                    display: flex;
+
+                    .title {
+                        color: #282c3f;
+                        font-weight: 400;
+                        font-size: 13px;
+                        flex-grow: 1;
+                    }
+
+                    .text {
+                        font-size: 13px;
+                    }
+                }
+            }
+        }
+    
+    }
+    
+    .payment_details {
+        // border: 1px solid blue;
+        padding-left: 40px;
+
+        .payment_details_container {
+            display: flex;
+            justify-content: space-between;
+            padding: 16px 0;
+          
+            .via {
+                font-size: 12px;
+                line-height: 15px;
+                font-weight: 500;
+                color: #686b78;
+            }
+
+            .total {
+                display: flex;
+                font-size: 14px;
+                font-weight: 600;
+                line-height: 17px;
+                color: #282c3f;
+
+                .text {
+                    margin-right: 40px;
+                    text-transform: uppercase;
+                }
+
+                .rupee {
+                    &::before {
+                        content: "₹";
+                        margin-right: 0.1rem;
+                    }
+                }
+            }
+        }
+        
+    }
+}

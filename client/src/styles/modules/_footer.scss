@@ -1,0 +1,5 @@
+.footer_container {
+    @media screen and (max-width: $md) {
+        display: none;
+    }
+}

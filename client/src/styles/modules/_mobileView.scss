@@ -1,0 +1,70 @@
+.mobile_view {
+
+
+    .portfolio__container {
+        height: 410px;
+
+        .portfolio__content {
+            img {
+                width: 100%;
+                background-size: cover;
+                background-position: center;
+            }
+        }
+
+        /* CSS to override Swiper's default pagination bullet styles */
+        .swiper-pagination-bullet-active {
+            background-color: #fc8019 !important;
+        }
+
+    }
+
+    .mobile_below_section {
+        margin: 30px 70px;
+
+        .text_animation_section {
+            h1 {
+                font-size: 24px;
+                margin: 0;
+                text-align: center;
+                font-weight: bold;
+            }
+        }
+
+        .HCM1R {
+            font-size: 13px;
+            color: #93959f;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        ._1NevO {
+            width: 220px;
+            height: 50px;
+            margin: 0 auto;
+            padding: 15px 0;
+            line-height: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            display: block;
+            margin-top: 16px;
+        }
+
+        ._3yxii {
+            font-size: 13px;
+            color: #93959f;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .H8i3Q {
+            color: #fc8019;
+        }
+
+        
+    }
+    ._2YNHY {
+        opacity: 1;
+        top: 17px;
+    }
+}

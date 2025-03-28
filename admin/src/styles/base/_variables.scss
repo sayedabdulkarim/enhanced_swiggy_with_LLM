@@ -1,0 +1,29 @@
+// Colors Variables
+$primaryColor: #DE2C29;
+$redColor: #AA1B1B;
+$yellowColor: yellow;
+$whiteColor: #fff;
+$grayColor: #D1D1D1;
+$blackColor: #000;
+$pinkColor: #6E0D88;
+// Fonts
+$Oswald: 'Oswald', sans-serif;
+$LeagueGothic: 'League Gothic', sans-serif;
+$OswaldLight: "Oswald-Light";
+// Text Variables
+$smallTextSize: 14px;
+$defaultTextSize: 16px;
+$defaultLineHeight: 22px;
+$largeTextSize: 36px;
+// Media Query Break Points
+$desktop: 1025px;
+$lg: 992px;
+$md: 767px;
+$sm: 639px;
+$bs-sm: 576px;
+$xsm: 479px;
+$sm-360: 361px;
+// Px to em conversion
+@function em($pixels, $context: $defaultTextSize) {
+    @return ($pixels / $context) * 1em;
+}

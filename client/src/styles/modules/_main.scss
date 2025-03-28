@@ -1,0 +1,226 @@
+.main_wrapper {
+  // margin-top: 100px;
+  margin-top: 80px;
+  // position: relative;
+
+  .header_myAccount {
+  }
+  
+  ._2CgXb {
+    
+    &:hover .Dropdowncontent {
+      display: block;
+    }
+  }
+
+  .Dropdown {
+    position: relative;
+    display: inline-block;
+
+    .Dropdowncontent::before {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      border: 8px solid transparent;
+      border-top-color: orange;
+      border-bottom: 0;
+      margin-left: -8px;
+      z-index: 0;
+      top: -10px;
+      transform: rotate(180deg);
+    }
+
+    /* White part of the caret */
+    .Dropdowncontent::after {
+      content: "";
+      position: absolute;
+      bottom: calc(100% + 0px);
+      left: 50%;
+      border: 6px solid transparent;
+      border-top-color: white;
+      border-bottom: 0;
+      margin-left: -6px;
+      z-index: 1;
+      transform: rotate(180deg);
+    }
+
+
+    .Dropdowncontent {
+      border-top: 2px solid orange;
+      display: none;
+      position: absolute;
+      min-width: 200px;
+      box-shadow: 0px 8px 16px 10px rgba(0, 0, 0, 0.2);
+      z-index: 1;
+      background-color: #f9f9f9;
+      box-sizing: border-box;
+      margin-top: 32px;
+      right: -70px;
+      padding: 20px;
+
+      span {
+        display: block;
+        color: #3d4512;
+        margin-bottom: 10px;
+
+        &:hover {
+          // color: red;
+          color: rgba(2, 6, 12, 0.92);
+          font-weight: 600;
+        }
+
+      }
+
+    }
+
+    .Dropdowncontent a {
+      box-sizing: border-box;
+      width: 80%;
+      padding: 10px 15px;
+      display: inline-block;
+    }
+
+
+  }
+
+  .d-none {
+    display: none;
+  }
+
+  .d-block {
+    display: block;
+  }
+
+
+  .menuStickyBottom {
+
+    width: 800px;
+    margin: 0 auto;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    pointer-events: none;
+
+    .fabButton {
+      transform: translateZ(0);
+      height: 64px;
+      z-index: 1;
+      transition: transform .25s ease;
+      will-change: transform;
+      // -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      contain: content;
+
+      .MenuFabButton {
+        position: absolute;
+        left: 50%;
+        top: 0;
+        transform: translateX(-50%);
+        width: 150px;
+        height: 40px;
+        pointer-events: auto;
+
+        .FabButton_container {
+          height: 40px;
+          width: 150px;
+          border-radius: 30px;
+          background: #5d8ed5;
+          color: #fff;
+          text-align: center;
+          box-shadow: 0 5px 10px 0 rgba(0,0,0,.3), 0 2px 1px 0 rgba(93,141,213,.2);
+          padding: 14px;
+          font-weight: 600;
+          font-size: .93rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-transform: uppercase;
+          will-change: transform;
+          backface-visibility: hidden;
+          transform: scaleX(1);
+          transition: transform .25s ease-in-out;
+
+          .icon-menu {
+            margin-right: 6px;
+            font-size: .86rem;
+            font-family: icomoon;
+            font-style: normal;
+            font-weight: 400;
+            font-variant: normal;
+            text-transform: none;
+            line-height: 1;
+            -webkit-font-smoothing: antialiased;
+          }
+
+        }
+
+      }
+
+    }
+
+    .viewCart {
+      transform: translateZ(0);
+      height: 48px;
+      overflow: hidden;
+      z-index: 3;
+      transition: transform .25s ease;
+      will-change: transform;
+      backface-visibility: hidden;
+      transform: translate3d(0,100%,0);
+      contain: content;
+      position: relative;
+
+      > button {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+
+        .styles_content {
+          height: 100%;
+          display: flex;
+          align-items: center;
+          padding: 0 16px;
+
+          .styles_main {
+            flex: 1;
+            flex-direction: column;
+            line-height: 1.2;
+            .styles_mainTitle{ 
+              font-weight: 600;
+              font-size: 1rem;
+              display: block;
+            }
+            .styles_mainSubTitle {
+              font-size: .93rem;
+              display: block;
+            }
+          }
+
+          .styles_viewCart {
+            text-transform: uppercase;
+            font-size: 1.07rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+
+            // > span {}
+
+            > img {
+              margin-left: 5px;
+            }
+          }
+
+        }
+
+      }
+
+    }
+
+  }
+
+
+}

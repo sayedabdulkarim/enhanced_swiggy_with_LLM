@@ -1,0 +1,17 @@
+h1{
+    font-size: em(24px);
+}
+h2{
+    font-size: em(28px);
+}
+.h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6{
+    font-family: $LeagueGothic;
+}
+@media only screen and (max-width: $sm)  {
+    h1{
+        font-size: em(20px);
+    }
+    p,li{
+        font-size: em(16px);
+    }
+}

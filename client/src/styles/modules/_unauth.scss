@@ -1,0 +1,109 @@
+.unauth_wrapper {
+    // border: 2px solid red;
+    width: 100%;
+    
+    .banner_section {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        height: 540px;
+        .left_section {
+            width: 50%;
+            // border: 1px solid green;
+            height: 100%;
+            padding: 30px 80px;
+
+            .icon_section {
+                
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+
+                img {
+                    // width: 125px;
+                    transition: transform .3s cubic-bezier(.23,1,.32,1) 0ms;             
+                    // margin-top: 92px;
+                }
+
+            }
+
+            .text_animation_section  {
+                h1 {
+                    transition: opacity 0.5s ease-in-out;
+                    opacity: 0;
+                    opacity: 1;
+                    margin-top: 60px;
+
+                }
+            }
+
+            .input_section {
+                .location-form {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                  }
+                  
+                  .input-group {
+                    display: flex;
+                    border: 1px solid #ccc;
+                    border-radius: 4px;
+                    width: 100%;
+                    margin: 35px 0;
+                  }
+                  
+                  .location-input {
+                    flex-grow: 1;
+                    // padding: 10px;
+                    border: none;
+                    border-right: 1px solid #ccc;
+                  }
+                  
+                  .locate-btn {
+                    background: none;
+                    border: none;
+                    padding: 10px;
+                    cursor: pointer;
+
+                    &:hover {
+                        background-color: #e9e9eb;
+                    }
+                  }
+                  
+                  .submit-btn {
+                    background-color: #fc8019;
+                    color: white;
+                    border: none;
+                    padding: 10px 20px;
+                    border-radius: 0 4px 4px 0;
+                    cursor: pointer;
+                    height: 58px;
+                    line-height: normal;
+                  }
+                  
+                  /* You may need additional styling to match the exact look from the image */
+                  
+            }
+
+        }
+        .right_section {
+            width: 50%;
+            // border: 1px solid yellow;
+            background-image: url(https://media-assets.swiggy.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,h_1340/Lunch1_vlksgq);
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            background-color: hsla(26,5%,70%,.2);
+        }
+    }
+
+    // @media screen and (max-width: $lg) {
+    //     border: 2px solid green;
+    // }
+    // @media screen and (max-width: $md) {
+    //     border: 2px solid yellow;
+    // }
+}
+
+

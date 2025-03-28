@@ -1,0 +1,280 @@
+.favorite_container {
+    // border: 1px solid red;
+    padding: 0 20px;
+    min-height: 100vh;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    
+    .title_container {
+
+        color: #282c3f;
+        padding-top: 60px;
+        padding-bottom: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        max-width: 1260px;
+        min-width: 1260px;
+        padding-left: 16px;
+        position: relative;
+        margin: 0 auto;
+
+        .text {
+            font-size: 40px;
+            font-weight: 600;
+        }
+        
+        .divider {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-top: 8px;
+            max-width: 800px;
+            margin: 10px 0px;
+        }
+    }
+
+    .items_container {
+        position: relative;
+        min-height: calc(100vh - 70px);
+        width: 1260px;
+        margin: 0 auto;
+
+        .items_wrapper {
+
+            display: flex;
+            width: 100%;
+            height: 100%;
+            -ms-flex-direction: row;
+            flex-direction: row;
+            -ms-flex-pack: start;
+            justify-content: flex-start;
+            -ms-flex-align: start;
+            align-items: flex-start;
+            -ms-flex-wrap: wrap;
+            flex-wrap: wrap;
+            background: rgb(255, 255, 255);
+
+            .item {
+                margin: 0px 16px;
+                
+                .item_wrapper {
+
+                    .item_card {
+
+                        text-decoration: none;
+                        color: inherit;
+                        outline: 0px;
+                        cursor: pointer;
+                        display: block;
+                        width: 280px;
+                        margin: 20px 0px 0px !important;
+
+                        .item_card_wrapper {
+
+                            display: grid;
+                            transition: all 0.05s ease 0s;
+                            cursor: pointer;
+                            gap: 12px;
+                            grid-auto-flow: row;
+                            justify-content: stretch;
+                            -webkit-box-align: center;
+                            align-items: center;
+                            padding: 0px;
+
+                            .image_wrapper {
+                                position: relative;
+
+                                &::before {
+                                    content: "";
+                                    height: 0px;
+                                    display: block;
+                                    padding-top: calc(66.6667%);
+                                }
+
+                                .image_container {
+                                    position: absolute;
+                                    top: 0px;
+                                    left: 0px;
+                                    width: 100%;
+                                    height: 100%;
+
+                                    .bg_img {
+                                        position: relative;
+                                        width: 100%;
+                                        height: 100%;
+                                        border-radius: 16px;
+                                        overflow: hidden;
+                                        filter: drop-shadow(rgba(0, 0, 0, 0.1) 0px 2px 8px);
+
+                                        img {
+                                            width: 100%;
+                                            height: 100%;
+                                            object-fit: cover;
+                                        }
+                                        
+                                        .bg_overlay {
+                                            position: absolute;
+                                            bottom: 0px;
+                                            right: 0px;
+                                            left: 0px;
+                                            display: grid;
+                                            align-content: end;
+                                            text-align: left;
+                                            padding-left: 12px;
+                                            padding-right: 12px;
+                                            padding-bottom: 8px;
+                                            height: calc(81px);
+                                            background: linear-gradient(rgba(27, 30, 36, 0) 0%, rgb(27, 30, 36) 84.21%);
+                                        }
+                                    }
+
+                                    .bg_strip {
+                                        position: absolute;
+                                        left: -8px;
+                                        top: 12px;
+
+                                        .bg_strip_over {
+                                            position: absolute;
+                                            top: 0px;
+                                            height: 37px;
+                                            padding-left: 8px;
+                                            display: flex;
+                                            flex-direction: row;
+                                            -webkit-box-align: center;
+                                            align-items: center;
+
+                                            svg {
+                                                margin-right: 8px;
+                                            }
+
+                                            .bg_strip_over_text {
+                                                display: flex;
+                                                flex-direction: column;
+                                                text-transform: capitalize;
+
+                                                .text {
+                                                    -webkit-font-smoothing: antialiased;
+                                                    // font-family: ProximaNovaCond-Bold;
+                                                    font-size: 12px;
+                                                    font-weight: 600;
+                                                    font-style: normal;
+                                                    line-height: 11px;
+                                                    letter-spacing: -0.4px;
+                                                    color: rgba(255, 255, 255, 0.75);
+                                                }
+                                            
+                                            }
+                                        }
+                                    }
+
+
+                                }
+                            }
+
+                            .description_wrapper {
+                                margin-left: 12px;
+
+                                .title {
+                                    margin: 0px;
+                                    -webkit-font-smoothing: antialiased;
+                                    // font-family: "Basis Grotesque Pro";
+                                    font-size: 18px;
+                                    font-weight: 700;
+                                    line-height: 24px;
+                                    letter-spacing: -0.3px;
+                                    color: rgba(2, 6, 12, 0.75);
+                                    overflow: hidden;
+                                    width: 100%;
+                                    display: -webkit-box;
+                                    overflow-wrap: break-word;
+                                    -webkit-line-clamp: 1;
+                                    -webkit-box-orient: vertical;
+                                }
+
+                                .subtext_container {
+
+                                    display: grid;
+                                    -webkit-box-align: center;
+                                    align-items: center;
+                                    margin-top: 2px;
+                                    gap: 2px;
+                                    grid-auto-flow: column;
+                                    -webkit-box-pack: start;
+                                    justify-content: start;
+
+                                    .svg_container {
+                                        margin-top: -2px;
+                                    }
+
+                                    .time_container {
+                                        margin-top: -4px;
+                                        -webkit-font-smoothing: antialiased;
+                                        // font-family: "Basis Grotesque Pro";
+                                        font-size: 16px;
+                                        font-weight: 700;
+                                        line-height: 19px;
+                                        letter-spacing: -0.3px;
+                                        color: rgba(2, 6, 12, 0.75);
+                                        overflow: hidden;
+                                        width: 100%;
+                                        display: -webkit-box;
+                                        overflow-wrap: break-word;
+                                        -webkit-line-clamp: 1;
+                                        -webkit-box-orient: vertical;
+                                    }
+
+                                }
+
+                                .time_container {
+                                    display: grid;
+                                    -webkit-box-align: center;
+                                    align-items: center;
+                                    margin-top: 2px;
+                                    gap: 2px;
+
+                                    .time {
+                                        -webkit-font-smoothing: antialiased;
+                                        // font-family: "Basis Grotesque Pro";
+                                        font-size: 16px;
+                                        font-weight: 700;
+                                        line-height: 19px;
+                                        letter-spacing: -0.3px;
+                                        color: rgba(2, 6, 12, 0.75);
+                                    }
+                                
+                                }
+
+                                .descriptions_container {
+                                    display: grid;
+                                    -webkit-box-align: center;
+                                    align-items: center;
+                                    margin-top: 2px;
+                                    gap: 2px;
+
+                                    > div {
+                                        -webkit-font-smoothing: antialiased;
+                                        // font-family: "Basis Grotesque Pro";
+                                        font-size: 16px;
+                                        font-weight: 200;
+                                        line-height: 19px;
+                                        letter-spacing: -0.3px;
+                                        color: rgba(2, 6, 12, 0.6);
+                                        overflow: hidden;
+                                        width: 100%;
+                                        display: -webkit-box;
+                                        overflow-wrap: break-word;
+                                        -webkit-line-clamp: 1;
+                                        -webkit-box-orient: vertical;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                }
+            }
+
+        }
+    }
+}
