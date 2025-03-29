@@ -139,7 +139,6 @@ const AddMenu = () => {
             </Col>
           </Row>
         </div>
-
         {/* Row 2: Description */}
         <Row gutter={16}>
           <Col span={12}>
@@ -166,6 +165,42 @@ const AddMenu = () => {
           </Col>
         </Row>
 
+        {/*New Row for Features/Keywords and Generate Description */}
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item
+              name="features"
+              label="Enter Features/Keywords"
+              rules={[
+                {
+                  required: true,
+                  message: "Please input features or keywords",
+                },
+              ]}
+            >
+              <Input.TextArea
+                rows={4}
+                placeholder="Enter features or keywords"
+              />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Button
+              type="default"
+              onClick={() => {
+                // Add logic to generate description based on features/keywords
+                const features = form.getFieldValue("features");
+                if (features) {
+                  const generatedDescription = `${features}`;
+                  form.setFieldsValue({ description: generatedDescription });
+                }
+              }}
+              style={{ marginTop: "32px" }} // Align with the input field
+            >
+              Generate Description
+            </Button>
+          </Col>
+        </Row>
         <Form.Item>
           <Button type="primary" htmlType="submit" className="submit_btn">
             Add Item
