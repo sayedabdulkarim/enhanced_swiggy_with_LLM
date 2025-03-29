@@ -12,6 +12,7 @@ import homeRoutes from "./routes/homeRoutes.js";
 import restaurantRoutes from "./routes/restaurantRoute.js";
 import addressRoutes from "./routes/addressRoutes.js";
 import cartRoutes from "./routes/cartRoute.js";
+import llmRoutes from "./routes/admin/llmRoutes.js";
 
 //adminRoutes
 import adminUserRoutes from "./routes/admin/adminUserRoutes.js";
@@ -61,6 +62,8 @@ app.use("/api/users", restaurantRoutes);
 app.use("/api/users", addressRoutes);
 //cart
 app.use("/api/users", cartRoutes);
+//llm
+app.use("/api/llm", llmRoutes);
 
 ////////// ADMIN /////////////
 app.use("/api/admin", adminUserRoutes);
