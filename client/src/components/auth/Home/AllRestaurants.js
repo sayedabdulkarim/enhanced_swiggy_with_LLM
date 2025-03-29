@@ -72,14 +72,15 @@ const AllRestaurants = ({ isLoadingHomePage }) => {
                 <li
                   key={_id}
                   onClick={() => handleNavigation(name, _id)}
-                  className={`${
-                    isRestaurantOpen(
-                      availability?.startTime,
-                      availability?.nextCloseTime
-                    )
-                      ? ""
-                      : "isCLosed"
-                  }`}
+                  //TODO: to check start n end date
+                  // className={`${
+                  //   isRestaurantOpen(
+                  //     availability?.startTime,
+                  //     availability?.nextCloseTime
+                  //   )
+                  //     ? ""
+                  //     : "isCLosed"
+                  // }`}
                 >
                   {<TopRestaurantOfferBadge isShow={badges} />}
                   <div className="image_wrapper">
