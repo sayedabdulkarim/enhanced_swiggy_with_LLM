@@ -1,12 +1,10 @@
 import React, { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 import UnAuthMobileScreen from "./mobile";
 import UnAuthWebScreen from "./web";
 import { isMobile } from "../../utils/unauthHelper";
 import { useTextCycle } from "../../hooks/useTextCycle";
-import { auth } from "../../config/firebase.config";
 //Store n api's Queries, Mutation
 import {
   useLoginMutation,
@@ -91,37 +89,48 @@ const Index = () => {
       [e.target.name]: e.target.value,
     });
   };
+
+  // Add a mock confirmation object
+  const createMockConfirmation = (phoneNumber) => {
+    return {
+      verificationId: "mock-verification-id",
+      confirm: (code) => {
+        return new Promise((resolve, reject) => {
+          // Check if OTP is correct (12345)
+          if (code === "12345") {
+            resolve({
+              user: {
+                phoneNumber: phoneNumber,
+              },
+            });
+          } else {
+            reject(new Error("Invalid OTP. Please try again."));
+          }
+        });
+      },
+    };
+  };
+
   //send OTP
   const sendOtp = async () => {
     setIsLoadingOtp(true);
     try {
-      const recaptcha = new RecaptchaVerifier(auth, "recaptcha", {
-        size: "invisible",
-        callback: (response) => {
-          // reCAPTCHA solved - you can proceed with OTP request
-        },
-      });
-
       const { phone } = loginFormData;
       const formattedNumber = `+91${phone}`;
 
-      const confirmation = await signInWithPhoneNumber(
-        auth,
-        formattedNumber,
-        recaptcha
-      );
+      // Use the mock confirmation instead
+      const confirmation = createMockConfirmation(formattedNumber);
+
       if (confirmation?.verificationId) {
-        console.log("");
         handleShowAlert(
           dispatch,
           "success",
-          "Please check your phone, we send the OTP."
+          "Mock OTP sent! Use 12345 as your OTP code."
         );
         setIsOtp(true);
         setUser(confirmation);
         setIsLoadingOtp(false);
       }
-      console.log(confirmation, " conffff");
     } catch (error) {
       console.log(error, " errorr");
       handleShowAlert(
@@ -152,6 +161,7 @@ const Index = () => {
       }
     } catch (error) {
       setIsLoadingOtp(false);
+      handleShowAlert(dispatch, "error", "Invalid OTP. Please use 12345.");
       console.log(error, " eerr from opttt");
     }
   };
