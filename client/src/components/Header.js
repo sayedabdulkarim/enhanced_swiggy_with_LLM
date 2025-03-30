@@ -149,12 +149,12 @@ const Header = () => {
               </li>
               <li className="_1fo6c">
                 <div className="_2CgXb">
-                  <a className="_1T-E4" href="/search">
+                  <Link className="_1T-E4" to="search">
                     <span className="_3yZyp">
                       <NavbarSearchLogo />
                     </span>
                     <span>Search</span>
-                  </a>
+                  </Link>
                 </div>
               </li>
             </ul>
