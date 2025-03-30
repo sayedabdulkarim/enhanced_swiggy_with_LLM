@@ -1,11 +1,22 @@
-import React, { useEffect } from "react";
-import { Form, Row, Col, Input, InputNumber, Switch, Button } from "antd";
+import React, { useEffect, useState } from "react";
+import {
+  Form,
+  Row,
+  Col,
+  Input,
+  InputNumber,
+  Switch,
+  Button,
+  Spin,
+  message,
+} from "antd";
 import ImageUploadInput from "../../utils/FormComponent/ImageUploadInput";
 
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useAddItemToCategoryMutation } from "../../apiSlices/menuApiSlice";
 import { handleShowAlert } from "../../utils/commonHelper";
+import { useGenerateMenuDescriptionMutation } from "../../apiSlices/llmApiSlice";
 
 const AddMenu = () => {
   //misc
@@ -20,8 +31,14 @@ const AddMenu = () => {
     addItemToCategory,
     { isLoading: addItemToCategoryLoading, error: addItemToCategoryError },
   ] = useAddItemToCategoryMutation();
+
+  // Add the generate description mutation hook
+  const [generateMenuDescription, { isLoading: isGeneratingDescription }] =
+    useGenerateMenuDescriptionMutation();
+
   //state
   const [form] = Form.useForm();
+  const [testInProgress, setTestInProgress] = useState(false);
 
   function findCategoryId(categories, name) {
     for (let category of categories) {
@@ -33,7 +50,6 @@ const AddMenu = () => {
   }
 
   const onFinish = async (values) => {
-    // console.log(values);
     const { name, isVeg, inStock, price, description, imageUpload } = values;
     const categoryId = findCategoryId(
       restaurantMenuDetails?.restaurantMenu?.menu,
@@ -52,15 +68,13 @@ const AddMenu = () => {
 
     try {
       const res = await addItemToCategory({
-        // restaurantId: restaurantDetails?._id, // This should be a string
-        restaurantId: restaurantMenuDetails?.restaurantMenu?._id, // This should be a string
+        restaurantId: restaurantMenuDetails?.restaurantMenu?._id,
         categoryId,
         data: payload,
       }).unwrap();
 
       console.log(res, " resss");
       handleShowAlert(dispatch, "success", res?.message);
-      // dispatch(setCredentials({ ...res }));
       navigate("/");
     } catch (err) {
       handleShowAlert(dispatch, "error", err?.data?.message);
@@ -73,6 +87,27 @@ const AddMenu = () => {
       navigate("/");
     }
   }, [categoryName, navigate]);
+
+  const handleGenerateDescription = async () => {
+    const features = form.getFieldValue("features");
+    if (!features) {
+      message.warning("Please enter some features or keywords first");
+      return;
+    }
+    setTestInProgress(true);
+    try {
+      const result = await generateMenuDescription({ features }).unwrap();
+      if (result && result.description) {
+        form.setFieldsValue({ description: result.description });
+        message.success("Description generated successfully!");
+      }
+    } catch (error) {
+      console.error("Failed to generate description:", error);
+      handleShowAlert(dispatch, "error", "Failed to generate description");
+    } finally {
+      setTestInProgress(false);
+    }
+  };
 
   return (
     <div className="menu_form_container">
@@ -87,14 +122,13 @@ const AddMenu = () => {
       >
         <span>Selected Category</span> : {categoryName}
       </h3>
-      {/*  */}
       <Form
         form={form}
         layout="vertical"
         onFinish={onFinish}
         initialValues={{
-          isVeg: false, // Default value for isVeg
-          inStock: false, // Default value for inStock
+          isVeg: false,
+          inStock: false,
         }}
       >
         <div className="form_item">
@@ -139,7 +173,6 @@ const AddMenu = () => {
             </Col>
           </Row>
         </div>
-        {/* Row 2: Description */}
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
@@ -155,7 +188,7 @@ const AddMenu = () => {
           <Col span={12}>
             <Form.Item
               label="Item Image"
-              name="imageUpload" // Make sure this matches your form model
+              name="imageUpload"
               valuePropName="value"
               getValueFromEvent={(e) => e}
               rules={[{ required: true, message: "Please upload an image!" }]}
@@ -164,8 +197,6 @@ const AddMenu = () => {
             </Form.Item>
           </Col>
         </Row>
-
-        {/*New Row for Features/Keywords and Generate Description */}
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
@@ -186,23 +217,23 @@ const AddMenu = () => {
           </Col>
           <Col span={12}>
             <Button
-              type="default"
-              onClick={() => {
-                // Add logic to generate description based on features/keywords
-                const features = form.getFieldValue("features");
-                if (features) {
-                  const generatedDescription = `${features}`;
-                  form.setFieldsValue({ description: generatedDescription });
-                }
-              }}
-              style={{ marginTop: "32px" }} // Align with the input field
+              type="primary"
+              onClick={handleGenerateDescription}
+              style={{ marginTop: "32px" }}
+              loading={isGeneratingDescription}
+              disabled={isGeneratingDescription}
             >
               Generate Description
             </Button>
           </Col>
         </Row>
         <Form.Item>
-          <Button type="primary" htmlType="submit" className="submit_btn">
+          <Button
+            type="primary"
+            htmlType="submit"
+            className="submit_btn"
+            loading={addItemToCategoryLoading}
+          >
             Add Item
           </Button>
         </Form.Item>
