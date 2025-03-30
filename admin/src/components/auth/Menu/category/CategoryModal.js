@@ -40,12 +40,6 @@ const CategoryModal = ({
       visible={visible}
       onCancel={handleCancel}
       footer={[
-        <Button
-          key="test"
-          onClick={() => console.log({ restaurantMenuDetails })}
-        >
-          TEst
-        </Button>,
         <Button key="cancel" onClick={handleCancel}>
           Cancel
         </Button>,
