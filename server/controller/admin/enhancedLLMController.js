@@ -113,13 +113,22 @@ Return ONLY the description text without any additional commentary or formatting
 const searchRestaurantsWithLLM = asyncHandler(async (req, res) => {
   try {
     const { query } = req.query;
+    const { restaurants } = req.body;
 
     if (!query) {
       return res.status(400).json({ message: "Query parameter is required" });
     }
 
-    // Fetch all restaurants from the database
-    const allRestaurantsList = await AllRestaurantsModal.find();
+    // Use restaurants from request body if provided, otherwise fetch from database
+    let allRestaurantsList;
+    if (restaurants && Array.isArray(restaurants) && restaurants.length > 0) {
+      allRestaurantsList = restaurants;
+      console.log("Using restaurant data from request body");
+    } else {
+      // Fetch all restaurants from the database
+      allRestaurantsList = await AllRestaurantsModal.find();
+      console.log("Fetched restaurant data from database");
+    }
 
     if (!allRestaurantsList || allRestaurantsList.length === 0) {
       return res
