@@ -1,19 +1,34 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { apiSlice } from "./";
 
-const BASE_URL = "api/llm"; // If your API is on the same domain, leave this empty
-
-export const llmApiSlice = createApi({
-  reducerPath: "llmApi",
-  baseQuery: fetchBaseQuery({ baseUrl: BASE_URL }),
+export const llmApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     searchRestaurants: builder.query({
-      query: (query) => ({
+      query: ({ query, restaurants }) => ({
         url: `api/llm/search-restaurants`,
-        method: "GET",
-        params: { query },
+        method: "GET", // Keep as GET with query params
+        params: { query }, // Pass query as URL param
+        body: { restaurants }, // Pass restaurants in body
+      }),
+    }),
+    generateMenuDescription: builder.mutation({
+      query: (features) => ({
+        url: `api/llm/generate-description`,
+        method: "POST",
+        body: { features },
+      }),
+    }),
+    processInference: builder.mutation({
+      query: (data) => ({
+        url: `api/llm/inference`,
+        method: "POST",
+        body: data,
       }),
     }),
   }),
 });
 
-export const { useSearchRestaurantsQuery } = llmApiSlice;
+export const {
+  useSearchRestaurantsQuery,
+  useGenerateMenuDescriptionMutation,
+  useProcessInferenceMutation,
+} = llmApiSlice;
