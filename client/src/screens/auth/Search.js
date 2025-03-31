@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useGetHomePageDataQuery } from "../../apiSlices/homeApiSlice";
 import { useNavigate } from "react-router-dom";
 import TopRestaurantOfferBadge from "../../components/svgs/TopRestaurantOfferBadge";
@@ -11,47 +11,77 @@ const Search = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
+  const prevQueryRef = useRef("");
+  const searchCountRef = useRef(0);
 
-  const {
-    data: getHomePageData,
-    refetch,
-    isLoading: isLoadingHomePage,
-  } = useGetHomePageDataQuery();
+  // Get home page data
+  const { data: getHomePageData, isLoading: isLoadingHomePage } =
+    useGetHomePageDataQuery();
 
   // Get all restaurants for passing to API
   const allRestaurants = getHomePageData?.data?.allRestaurantsList || [];
 
-  // LLM search API with restaurant data
+  // Only skip if no query or no restaurants
+  const shouldSkipSearch = !debouncedQuery || !allRestaurants.length;
+
+  // LLM search API with improved skip logic
   const {
     data: llmSearchResults,
     isLoading: isLLMSearchLoading,
     error: llmSearchError,
+    isFetching: isSearchFetching,
   } = useSearchRestaurantsQuery(
-    { query: debouncedQuery, restaurants: allRestaurants },
-    { skip: !debouncedQuery || !allRestaurants.length }
+    {
+      query: debouncedQuery,
+      restaurants: allRestaurants,
+      requestId: searchCountRef.current,
+    },
+    {
+      skip: shouldSkipSearch,
+      refetchOnMountOrArgChange: true,
+    }
   );
 
-  // Debounce search input to avoid excessive API calls
+  // Improved console logging
   useEffect(() => {
+    if (llmSearchError) {
+      console.error("Search API error:", llmSearchError);
+    }
+  }, [llmSearchError]);
+
+  // Debounce search input with a simpler approach
+  useEffect(() => {
+    if (!searchQuery) {
+      setDebouncedQuery(""); // Clear debounced query when search is empty
+      return;
+    }
+
+    console.log("Search query changed to:", searchQuery);
+
     const timer = setTimeout(() => {
-      if (searchQuery) {
-        setDebouncedQuery(searchQuery);
-      }
+      searchCountRef.current += 1;
+      setDebouncedQuery(searchQuery);
+      console.log(
+        "Debounced query set to:",
+        searchQuery,
+        "with request ID:",
+        searchCountRef.current
+      );
     }, 500);
 
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  //func
-  const handleNavigation = (name, id) => {
-    navigate(`/restaurant/${name}/${id}`);
-  };
-
-  // Choose which restaurants to display based on search state
+  // Choose which restaurants to display
   const displayRestaurants =
     searchQuery && llmSearchResults?.results
       ? llmSearchResults.results
       : getHomePageData?.data?.allRestaurantsList || [];
+
+  // Handle navigation
+  const handleNavigation = (name, id) => {
+    navigate(`/restaurant/${name}/${id}`);
+  };
 
   return (
     <div className="home_best_offers home_all_restaurants">
@@ -92,7 +122,9 @@ const Search = () => {
           {isLLMSearchLoading
             ? "Searching with AI..."
             : llmSearchError
-            ? "Error: Could not perform AI search"
+            ? `Error: Could not perform AI search - ${
+                llmSearchError.message || "Unknown error"
+              }`
             : searchQuery
             ? `AI found ${
                 llmSearchResults?.resultsCount || 0
@@ -138,7 +170,6 @@ const Search = () => {
                       sla,
                       cuisines,
                       areaName,
-                      availability,
                     } = item;
 
                     return (

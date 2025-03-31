@@ -13,7 +13,7 @@ router.post("/inference", processModelInference);
 // Route for generating menu item descriptions
 router.post("/generate-description", generateMenuItemDescription);
 
-// Route for searching restaurants
-router.get("/search-restaurants", searchRestaurantsWithLLM);
+// Route for searching restaurants - changed from GET to POST
+router.post("/search-restaurants", searchRestaurantsWithLLM);
 
 export default router;
