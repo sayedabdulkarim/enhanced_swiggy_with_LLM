@@ -98,7 +98,7 @@ const Search = () => {
         <div style={{ marginBottom: "15px" }}>
           <input
             type="text"
-            placeholder="Ask anything about restaurants or food..."
+            placeholder="Ask anything about restaurants or food... e.g Find me a good South Indian restaurant under ₹500"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{
