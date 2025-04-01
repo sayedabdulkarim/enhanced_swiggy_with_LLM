@@ -108,49 +108,53 @@ Return ONLY the description text without any additional commentary or formatting
 });
 
 // @desc    Search restaurants using LLM
-// @route   GET /api/llm/search-restaurants
+// @route   POST /api/llm/search-restaurants
 // @access  Public
 const searchRestaurantsWithLLM = asyncHandler(async (req, res) => {
   try {
-    const { query, restaurants, requestId } = req.body;
+    const { query, restaurants: providedRestaurants, requestId } = req.body;
 
     if (!query) {
       return res.status(400).json({ message: "Query parameter is required" });
     }
 
-    console.log(
-      `Processing search request ID: ${requestId} for query: "${query}"`
-    );
+    console.log(`Processing search request for: "${query}" (ID: ${requestId})`);
 
-    // Use restaurants from request body if provided, otherwise fetch from database
-    let allRestaurantsList;
-    if (restaurants && Array.isArray(restaurants) && restaurants.length > 0) {
-      allRestaurantsList = restaurants;
-      console.log(`Using ${restaurants.length} restaurants from request body`);
+    // Use provided restaurants or fetch from database
+    let allRestaurants;
+    if (providedRestaurants && Array.isArray(providedRestaurants)) {
+      allRestaurants = providedRestaurants;
+      console.log(`Using ${providedRestaurants.length} provided restaurants`);
     } else {
-      // Fetch all restaurants from the database
-      allRestaurantsList = await AllRestaurantsModal.find();
-      console.log(
-        `Fetched ${allRestaurantsList.length} restaurants from database`
-      );
+      // Fetch restaurants from database
+      console.log("Fetching restaurants from database");
+      allRestaurants = await AllRestaurantsModal.find({});
     }
 
-    if (!allRestaurantsList || allRestaurantsList.length === 0) {
-      return res
-        .status(404)
-        .json({ message: "No restaurants found in database" });
+    if (!allRestaurants || allRestaurants.length === 0) {
+      return res.status(404).json({ message: "No restaurants found" });
     }
 
-    // Create a prompt for the LLM that includes the user query and restaurant data
+    // Filter only needed fields for LLM processing
+    const simplifiedRestaurants = allRestaurants.map((restaurant) => ({
+      areaName: restaurant.areaName,
+      avgRating: restaurant.avgRating,
+      costForTwo: restaurant.costForTwo,
+      cuisines: restaurant.cuisines,
+      name: restaurant.name,
+      veg: restaurant.veg,
+    }));
+
+    // Create a prompt for the LLM
     const prompt = `You are a restaurant search assistant. 
 Based on the user's query: "${query}", find the most relevant restaurants from this list:
-${JSON.stringify(allRestaurantsList, null, 2)}
+${JSON.stringify(simplifiedRestaurants, null, 2)}
 
 Return ONLY a JSON object that contains an array of restaurant names that match the query, in this format:
 { "matchingRestaurants": ["Restaurant Name 1", "Restaurant Name 2"] }
 Do not include any other text in your response.`;
 
-    // Call the LLM inference using fetch
+    // Call the LLM inference using fetch (reusing existing approach)
     const response = await fetch("http://localhost:11434/api/generate", {
       method: "POST",
       headers: {
@@ -167,8 +171,8 @@ Do not include any other text in your response.`;
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
 
-    const llmResponse = await response.json();
-    const responseText = llmResponse.response;
+    const data = await response.json();
+    const responseText = data.response;
 
     // Parse the LLM response to get matching restaurant names
     let matchingNames = [];
@@ -189,7 +193,7 @@ Do not include any other text in your response.`;
     // Filter restaurants based on the names returned by the LLM
     let matchingRestaurants = [];
     if (matchingNames && matchingNames.length > 0) {
-      matchingRestaurants = allRestaurantsList.filter((restaurant) =>
+      matchingRestaurants = allRestaurants.filter((restaurant) =>
         matchingNames.some(
           (name) =>
             restaurant.name.toLowerCase().includes(name.toLowerCase()) ||
@@ -203,7 +207,7 @@ Do not include any other text in your response.`;
       const keywords = query.toLowerCase().split(" ");
 
       // Check for cuisine-related keywords
-      const cuisineMatches = allRestaurantsList.filter(
+      const cuisineMatches = allRestaurants.filter(
         (restaurant) =>
           restaurant.cuisines &&
           restaurant.cuisines.some((cuisine) =>
