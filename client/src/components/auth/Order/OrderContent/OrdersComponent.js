@@ -57,10 +57,14 @@ const Orders = () => {
                   height="200"
                   width="300"
                   alt="img renderer"
-                  src={`https://media-assets.swiggy.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_660/${
+                  src={`${
                     getRestaurantById(allRestaurantsList, restaurantId)
                       ?.cloudinaryImageId
                   }`}
+                  // src={`https://media-assets.swiggy.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_660/${
+                  //   getRestaurantById(allRestaurantsList, restaurantId)
+                  //     ?.cloudinaryImageId
+                  // }`}
                 />
               </div>
               <div className="item_top_restaurant_details">
