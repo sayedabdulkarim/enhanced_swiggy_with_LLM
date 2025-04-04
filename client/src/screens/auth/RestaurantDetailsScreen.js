@@ -52,6 +52,7 @@ const RestaurantDetails = () => {
     return () => dispatch(setMenuBottomSlice(false));
   }, [dispatch]);
 
+  console.log({ restaurantDetails }, "restaurantDetails");
   //
 
   useEffect(() => {

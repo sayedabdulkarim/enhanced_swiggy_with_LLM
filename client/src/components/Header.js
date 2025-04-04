@@ -27,6 +27,8 @@ const Header = () => {
   );
 
   const { isOpenAddressDrawer } = useSelector((state) => state.headerReducer);
+  const { items } = useSelector((state) => state.cartReducer.cart);
+  const { userInfo } = useSelector((state) => state.authReducer);
 
   //apis
   const [logOut] = useLogoutMutation();
@@ -84,7 +86,7 @@ const Header = () => {
                       <Link className="_1T-E4" to="/checkout">
                         <span className="_3yZyp _18ZFk">
                           <NavbarCartLogo />
-                          <span className="_2vS77">2</span>
+                          <span className="_2vS77">{items?.length}</span>
                         </span>
                         <span>Cart</span>
                       </Link>
@@ -103,7 +105,7 @@ const Header = () => {
                         <span className="_3yZyp">
                           <NavbarProfileLogo />
                         </span>
-                        <span className="_1qbcC">abdul</span>
+                        <span className="_1qbcC">{userInfo?.data?.name}</span>
                       </Link>
                       <div className="Dropdown">
                         <div className="Dropdowncontent">

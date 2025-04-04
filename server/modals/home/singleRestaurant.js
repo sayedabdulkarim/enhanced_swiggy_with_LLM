@@ -51,8 +51,8 @@ const ItemSchema = new mongoose.Schema(
       },
     },
     offers: [OfferSchema],
-  },
-  { _id: false }
+  }
+  // { _id: false }
 ); // Prevent Mongoose from adding an _id field to each item
 
 const MenuCategorySchema = new mongoose.Schema({
