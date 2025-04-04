@@ -349,7 +349,11 @@ const Payments = ({ setIsPaymentType }) => {
                   </div>
                   {/*  */}
                   {/*  */}
-                  <div className="more_payment_list_item">
+                  <div
+                    className="more_payment_list_item"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => setIsPaymentType("cash_on_delivery")}
+                  >
                     <div className="item">
                       <div className="item_icon">
                         <img
@@ -371,8 +375,6 @@ const Payments = ({ setIsPaymentType }) => {
                       <div
                         className="payment_option_container_icon"
                         aria-hidden="true"
-                        style={{ cursor: "pointer" }}
-                        onClick={() => setIsPaymentType("cash_on_delivery")}
                       >
                         <svg
                           width="8"
