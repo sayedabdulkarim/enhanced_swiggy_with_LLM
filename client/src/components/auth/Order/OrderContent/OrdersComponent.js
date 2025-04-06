@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import OrderDetailsDrawerComponent from "../../../drawer/CustomDrawer";
 import OrderDetailsDrawerContent from "./OrderDetailsDrawerContent";
-
+import { Button, Modal, Rate, Input, message } from "antd";
+import { useSubmitReviewMutation } from "../../../../apiSlices/cartApiSlice";
 import {
   formatUTCToLocal,
   getRestaurantById,
@@ -11,6 +12,15 @@ import {
 const Orders = () => {
   const [isShowDrawer, setIsShowDrawer] = useState(false);
   const [getCurrentOrderDetails, setCurrentOrderDetails] = useState(null);
+  // Review modal states
+  const [isReviewModalVisible, setIsReviewModalVisible] = useState(false);
+  const [currentOrderForReview, setCurrentOrderForReview] = useState(null);
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewText, setReviewText] = useState("");
+
+  // API mutation hook
+  const [submitReview, { isLoading: isSubmittingReview }] =
+    useSubmitReviewMutation();
 
   const homePageData = useSelector((state) => state.homeReducer.homePageData);
   // Check if userInfo is available
@@ -36,6 +46,45 @@ const Orders = () => {
     setCurrentOrderDetails(data);
   };
 
+  // Review handling functions
+  const showReviewModal = (order) => {
+    setCurrentOrderForReview(order);
+    setReviewRating(order.rating || 0);
+    setReviewText(order.review || "");
+    setIsReviewModalVisible(true);
+  };
+
+  const handleReviewCancel = () => {
+    setIsReviewModalVisible(false);
+    setCurrentOrderForReview(null);
+    setReviewRating(0);
+    setReviewText("");
+  };
+
+  const handleReviewSubmit = async () => {
+    if (!reviewRating && !reviewText) {
+      message.error("Please provide either a rating or a review");
+      return;
+    }
+
+    try {
+      const response = await submitReview({
+        orderId: currentOrderForReview._id,
+        reviewData: {
+          rating: reviewRating,
+          review: reviewText,
+        },
+      }).unwrap();
+
+      message.success("Review submitted successfully");
+      handleReviewCancel();
+      // You might want to refresh the orders list here
+    } catch (error) {
+      message.error(error?.data?.message || "Failed to submit review");
+      console.error(error);
+    }
+  };
+
   return (
     <div className="order_details_component">
       <div
@@ -47,10 +96,9 @@ const Orders = () => {
       </div>
       {/*  */}
       {userOrderDetails?.map((item, idx) => {
-        const { _id, createdAt, items, restaurantId, finalCost } = item;
+        const { _id, createdAt, items, restaurantId, finalCost, status } = item;
         return (
           <div className="order_detail_item" key={_id}>
-            {/*  */}
             <div className="item_top">
               <div className="item_top_image">
                 <img
@@ -90,14 +138,12 @@ const Orders = () => {
                 </div>
                 <div
                   className="view-details"
-                  // onClick={() => console.log(item, " itemm")}
                   onClick={() => handleGetCurrentOrderDetails(item)}
                 >
                   VIEW DETAILS
                 </div>
               </div>
             </div>
-            {/*  */}
             <div className="item_bottom">
               {items?.map((o) => {
                 const { name, count, _id } = o;
@@ -110,6 +156,14 @@ const Orders = () => {
               <div className=" reorder">
                 <button className=" isActive">REORDER</button>
                 <button className="">HELP</button>
+                {status === "accept" && (
+                  <button
+                    className="review-btn"
+                    onClick={() => showReviewModal(item)}
+                  >
+                    REVIEW
+                  </button>
+                )}
               </div>
               <div className="payment">
                 Total Paid: <span> {finalCost} </span>
@@ -127,14 +181,47 @@ const Orders = () => {
         width={480}
         className={"order_details_custom_drawer"}
       >
-        {/* <AddressDrawerContentFromHome /> */}
         <OrderDetailsDrawerContent
           getCurrentOrderDetails={getCurrentOrderDetails}
           allRestaurantsList={allRestaurantsList}
         />
       </OrderDetailsDrawerComponent>
+
+      {/* Review Modal */}
+      <Modal
+        title="Write a Review"
+        open={isReviewModalVisible}
+        onCancel={handleReviewCancel}
+        footer={[
+          <Button key="back" onClick={handleReviewCancel}>
+            Cancel
+          </Button>,
+          <Button
+            key="submit"
+            type="primary"
+            loading={isSubmittingReview}
+            onClick={handleReviewSubmit}
+          >
+            Submit Review
+          </Button>,
+        ]}
+      >
+        <div style={{ marginBottom: 16 }}>
+          <p>Rate your experience:</p>
+          <Rate allowHalf value={reviewRating} onChange={setReviewRating} />
+        </div>
+        <div>
+          <p>Share your thoughts:</p>
+          <Input.TextArea
+            rows={4}
+            value={reviewText}
+            onChange={(e) => setReviewText(e.target.value)}
+            placeholder="Tell us about your experience..."
+          />
+        </div>
+      </Modal>
+
       <div className="order_detail_item" style={{ display: "none" }}>
-        {/*  */}
         <div className="item_top">
           <div className="item_top_image">
             <img
@@ -153,7 +240,6 @@ const Orders = () => {
             <div className="view-details">VIEW DETAILS</div>
           </div>
         </div>
-        {/*  */}
         <div className="item_bottom">
           <div className=" item_count">Banana Cake x 2</div>
           <div className=" reorder">
@@ -165,7 +251,6 @@ const Orders = () => {
           </div>
         </div>
       </div>
-      {/*  */}
       <div className="showMore">Show More Orders</div>
     </div>
   );
