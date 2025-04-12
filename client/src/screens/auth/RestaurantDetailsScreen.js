@@ -115,23 +115,63 @@ const RestaurantDetails = () => {
             <RestaurantDetailsTopComponent
               restaurantDetails={restaurantDetails?.data}
             />
-            {/* bottom_section */}
-            <Accordion
-              categories={restaurantDetails?.data?.menu?.menu || []}
-              categoryRefs={categoryRefs}
-            />
 
-            {/* menu stick bottom */}
-            <RestaurantMenuModal
-              isShowMenu={isShowMenu}
-              setIsShowMenu={setIsShowMenu}
-              restaurantCategories={restaurantDetails?.data?.menu?.menu || []}
-              onCategoryClick={handleCategoryClick}
-            />
-            <MenuStickBottom
-              isShowMenu={isShowMenu}
-              setIsShowMenu={setIsShowMenu}
-            />
+            {restaurantDetails?.data?.menu ? (
+              <>
+                {/* bottom_section */}
+                <Accordion
+                  categories={restaurantDetails?.data?.menu?.menu || []}
+                  categoryRefs={categoryRefs}
+                />
+
+                {/* menu stick bottom */}
+                <RestaurantMenuModal
+                  isShowMenu={isShowMenu}
+                  setIsShowMenu={setIsShowMenu}
+                  restaurantCategories={
+                    restaurantDetails?.data?.menu?.menu || []
+                  }
+                  onCategoryClick={handleCategoryClick}
+                />
+                <MenuStickBottom
+                  isShowMenu={isShowMenu}
+                  setIsShowMenu={setIsShowMenu}
+                />
+              </>
+            ) : (
+              <div
+                className="open-shortly-container"
+                style={{
+                  textAlign: "center",
+                  padding: "50px 20px",
+                  margin: "30px 0",
+                  backgroundColor: "#f8f8f8",
+                  borderRadius: "8px",
+                }}
+              >
+                <h2
+                  style={{
+                    fontSize: "24px",
+                    color: "#333",
+                    marginBottom: "15px",
+                  }}
+                >
+                  Opening Shortly
+                </h2>
+                <p
+                  style={{
+                    fontSize: "16px",
+                    color: "#666",
+                    marginBottom: "20px",
+                  }}
+                >
+                  This restaurant is getting ready to serve you delicious food.
+                </p>
+                <p style={{ fontSize: "16px", color: "#666" }}>
+                  The menu will be available soon. Please check back later!
+                </p>
+              </div>
+            )}
           </>
         )}
       </div>
