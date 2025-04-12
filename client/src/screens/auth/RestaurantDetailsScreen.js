@@ -149,6 +149,15 @@ const RestaurantDetails = () => {
                   borderRadius: "8px",
                 }}
               >
+                <img
+                  src="https://media.giphy.com/media/3o7bu8sRnYpTOG1p8k/giphy.gif"
+                  alt="Restaurant preparing"
+                  style={{
+                    width: "200px",
+                    marginBottom: "25px",
+                    borderRadius: "8px",
+                  }}
+                />
                 <h2
                   style={{
                     fontSize: "24px",
