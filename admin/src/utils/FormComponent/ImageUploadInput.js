@@ -64,7 +64,11 @@ const ImageUpload = ({ value, onChange }) => {
       customRequest={dummyRequest} // Prevent actual POST request
     >
       {value ? (
-        <img src={value} alt="avatar" style={{ width: "100%" }} />
+        <img
+          src={value}
+          alt="avatar"
+          style={{ width: "200px", height: "200px" }}
+        />
       ) : (
         uploadButton
       )}
