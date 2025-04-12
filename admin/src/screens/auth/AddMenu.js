@@ -223,7 +223,7 @@ const AddMenu = () => {
               loading={isGeneratingDescription}
               disabled={isGeneratingDescription}
             >
-              Generate Description
+              Let's AI to Generate Description for you
             </Button>
           </Col>
         </Row>
