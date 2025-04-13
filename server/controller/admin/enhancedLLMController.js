@@ -1,6 +1,7 @@
 import asyncHandler from "express-async-handler";
 import AllRestaurantsModal from "../../modals/home/allRestaurants.js";
 import CartModal from "../../modals/cartModal.js";
+import { elasticClient } from "../../config/elasticSearch.js";
 
 // @desc    Process model inference request
 // @route   POST /api/llm/inference
@@ -236,6 +237,144 @@ Do not include any other text in your response.`;
   }
 });
 
+// @desc    Search restaurants using Elasticsearch
+// @route   POST /api/llm/elastic-search
+// @access  Public
+const searchRestaurantsWithElastic = asyncHandler(async (req, res) => {
+  try {
+    const { query, requestId } = req.body;
+
+    if (!query) {
+      return res.status(400).json({ message: "Query parameter is required" });
+    }
+
+    console.log(
+      `Processing Elasticsearch request for: "${query}" (ID: ${requestId})`
+    );
+
+    // Check if the restaurants index exists
+    const indexExists = await elasticClient.indices.exists({
+      index: "restaurants",
+    });
+
+    // If index doesn't exist, create it and index all restaurants
+    if (!indexExists) {
+      console.log(
+        "Restaurants index does not exist, creating and indexing data"
+      );
+
+      // Create index with appropriate mappings
+      await elasticClient.indices.create({
+        index: "restaurants",
+        body: {
+          mappings: {
+            properties: {
+              name: { type: "text" },
+              areaName: { type: "text" },
+              cuisines: { type: "text" },
+              costForTwo: { type: "keyword" },
+              avgRating: { type: "float" },
+              veg: { type: "boolean" },
+            },
+          },
+        },
+      });
+
+      // Fetch all restaurants from MongoDB
+      const allRestaurants = await AllRestaurantsModal.find({});
+
+      // Prepare restaurants for bulk indexing
+      const operations = allRestaurants.flatMap((restaurant) => [
+        { index: { _index: "restaurants", _id: restaurant._id.toString() } },
+        {
+          name: restaurant.name,
+          areaName: restaurant.areaName,
+          cuisines: restaurant.cuisines.join(", "),
+          costForTwo: restaurant.costForTwo,
+          avgRating: restaurant.avgRating,
+          veg: restaurant.veg,
+          mongoId: restaurant._id.toString(),
+        },
+      ]);
+
+      // Bulk index the restaurants
+      if (operations.length > 0) {
+        await elasticClient.bulk({ refresh: true, operations });
+        console.log(
+          `Indexed ${allRestaurants.length} restaurants to Elasticsearch`
+        );
+      }
+    }
+
+    // Perform search using Elasticsearch
+    const searchResult = await elasticClient.search({
+      index: "restaurants",
+      body: {
+        query: {
+          multi_match: {
+            query: query,
+            fields: ["name^3", "cuisines^2", "areaName"],
+            fuzziness: "AUTO",
+          },
+        },
+        size: 20,
+      },
+    });
+
+    // Process search results
+    const elasticResults = searchResult.hits.hits;
+    console.log(`Elasticsearch found ${elasticResults.length} results`);
+
+    // If no results from Elasticsearch, try to fetch matching restaurants from MongoDB
+    if (elasticResults.length === 0) {
+      console.log("No Elasticsearch results, using MongoDB fallback");
+      const keywords = query.toLowerCase().split(" ");
+
+      const mongoResults = await AllRestaurantsModal.find({
+        $or: [
+          { name: { $regex: query, $options: "i" } },
+          { cuisines: { $in: keywords.map((k) => new RegExp(k, "i")) } },
+          { areaName: { $regex: query, $options: "i" } },
+        ],
+      });
+
+      return res.status(200).json({
+        query: query,
+        results: mongoResults,
+        resultsCount: mongoResults.length,
+        searchMethod: "elasticsearch-with-mongodb-fallback",
+      });
+    }
+
+    // Get MongoDB IDs from Elasticsearch results
+    const restaurantIds = elasticResults.map((hit) => hit._source.mongoId);
+
+    // Fetch full restaurant data from MongoDB using the IDs
+    const matchingRestaurants = await AllRestaurantsModal.find({
+      _id: { $in: restaurantIds },
+    });
+
+    // Sort the results to match the order from Elasticsearch
+    const sortedRestaurants = restaurantIds
+      .map((id) => matchingRestaurants.find((r) => r._id.toString() === id))
+      .filter(Boolean);
+
+    // Return the results
+    return res.status(200).json({
+      query: query,
+      results: sortedRestaurants,
+      resultsCount: sortedRestaurants.length,
+      searchMethod: "elasticsearch",
+    });
+  } catch (error) {
+    console.error("Error in Elasticsearch restaurant search:", error);
+    res.status(500).json({
+      message: "Failed to perform Elasticsearch search",
+      error: error.message,
+    });
+  }
+});
+
 // @desc    Get personalized restaurant recommendations based on user history
 // @route   GET /api/llm/personalized-recommendations
 // @access  Public
@@ -428,9 +567,12 @@ Return ONLY a JSON object with this structure:
   }
 });
 
+//elastic searhch
+
 export {
   processModelInference,
   generateMenuItemDescription,
   searchRestaurantsWithLLM,
+  searchRestaurantsWithElastic,
   getPersonalizedRecommendations,
 };
