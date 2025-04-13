@@ -141,11 +141,12 @@ const Header = () => {
               </li>
               <li className="_1fo6c">
                 <div className="_2CgXb">
-                  <Link className="_1T-E4" to="/offers-near-me">
+                  <Link className="_1T-E4" to="/recommendation">
                     <span className="_3yZyp">
                       <NavbarOffersLogo />
                     </span>
-                    Offers<span className="PJaej">NEW</span>
+                    {/* Offers<span className="PJaej">NEW</span> */}
+                    Recommendation<span className="PJaej">NEW</span>
                   </Link>
                 </div>
               </li>

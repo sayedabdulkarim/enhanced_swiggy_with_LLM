@@ -1,6 +1,6 @@
 import asyncHandler from "express-async-handler";
-// Import the restaurant model - you may need to adjust the path based on your project structure
 import AllRestaurantsModal from "../../modals/home/allRestaurants.js";
+import CartModal from "../../modals/cartModal.js";
 
 // @desc    Process model inference request
 // @route   POST /api/llm/inference
@@ -178,7 +178,7 @@ Do not include any other text in your response.`;
     let matchingNames = [];
     try {
       // Find JSON content between curly braces
-      const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+      const jsonMatch = responseText.match(/\{[\\s\S]*\}/);
 
       if (jsonMatch) {
         const parsedJson = JSON.parse(jsonMatch[0]);
@@ -236,8 +236,201 @@ Do not include any other text in your response.`;
   }
 });
 
+// @desc    Get personalized restaurant recommendations based on user history
+// @route   GET /api/llm/personalized-recommendations
+// @access  Public
+const getPersonalizedRecommendations = asyncHandler(async (req, res) => {
+  try {
+    // Get user ID from query parameter
+    const userId = req.query.userId;
+
+    // Check if userId is null, undefined, or "null" string
+    if (!userId || userId === "null" || userId === "undefined") {
+      return res.status(200).json({
+        message: "Valid user ID is required",
+        recommendations: [],
+        userPreferences: {
+          favoriteCuisines: [],
+          pricePreference: "",
+          dietaryPreferences: "",
+        },
+      });
+    }
+
+    console.log(`Getting personalized recommendations for user: ${userId}`);
+
+    // Get user's order history - using correct models
+    let userOrders = [];
+    try {
+      // Get completed or accepted orders
+      userOrders = await CartModal.find({
+        userId: userId,
+        status: { $in: ["completed", "accept"] },
+      })
+        .sort({ createdAt: -1 })
+        .limit(10);
+
+      console.log(`Found ${userOrders.length} orders for user ${userId}`);
+
+      // Early return if no orders
+      if (!userOrders || userOrders.length === 0) {
+        return res.status(200).json({
+          message: "No order history found for this user",
+          recommendations: [],
+          userPreferences: {
+            favoriteCuisines: [],
+            pricePreference: "",
+            dietaryPreferences: "",
+          },
+        });
+      }
+
+      // Get restaurant details for each order
+      const restaurantIds = userOrders.map((order) => order.restaurantId);
+      const restaurantDetails = await AllRestaurantsModal.find({
+        _id: { $in: restaurantIds },
+      });
+
+      console.log(`Found ${restaurantDetails.length} restaurant details`);
+
+      // Map restaurant details to orders
+      const orderHistory = userOrders.map((order) => {
+        const restaurant = restaurantDetails.find(
+          (r) => r._id.toString() === order.restaurantId.toString()
+        );
+
+        return {
+          restaurantName: restaurant ? restaurant.name : "Unknown Restaurant",
+          cuisines: restaurant ? restaurant.cuisines : [],
+          orderedItems: order.items.map((item) => item.name),
+          rating: order.rating || null,
+          review: order.review || null,
+          costForTwo: restaurant ? restaurant.costForTwo : null,
+          veg: restaurant ? restaurant.veg : false,
+        };
+      });
+
+      // Fetch all restaurants for recommendations
+      const allRestaurants = await AllRestaurantsModal.find({});
+      console.log(
+        `Found ${allRestaurants.length} restaurants total for recommendations`
+      );
+
+      // Filter only necessary data for LLM
+      const restaurantsForLLM = allRestaurants.map((r) => ({
+        name: r.name,
+        areaName: r.areaName,
+        cuisines: r.cuisines,
+        avgRating: r.avgRating,
+        costForTwo: r.costForTwo,
+        veg: r.veg,
+      }));
+
+      // Create a prompt for the LLM
+      const prompt = `You are a restaurant recommendation system.
+Based on this user's order history and preferences:
+${JSON.stringify(orderHistory, null, 2)}
+
+Please analyze their food preferences, favorite cuisines, price range, and highly-rated restaurants.
+Then recommend 5 restaurants from this list that they might enjoy:
+${JSON.stringify(restaurantsForLLM.slice(0, 100), null, 2)}
+
+Return ONLY a JSON object with this structure:
+{
+  "recommendations": [
+    {
+      "restaurantName": "Name",
+      "reason": "Brief personalized explanation why this restaurant matches their preferences"
+    }
+  ],
+  "userPreferences": {
+    "favoriteCuisines": ["Cuisine1", "Cuisine2"],
+    "pricePreference": "budget/mid-range/premium",
+    "dietaryPreferences": "any dietary preferences detected (veg/non-veg/etc)"
+  }
+}`;
+
+      console.log("Sending request to LLM for personalization...");
+      // Call the LLM inference
+      const response = await fetch("http://localhost:11434/api/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "llama3.2:1b",
+          prompt: prompt,
+          stream: false,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const responseText = data.response;
+
+      // Parse the LLM response
+      let recommendationData = {};
+      try {
+        // Extract JSON from the response
+        const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          recommendationData = JSON.parse(jsonMatch[0]);
+          console.log("Successfully parsed LLM recommendations");
+        } else {
+          throw new Error("Could not parse LLM response");
+        }
+      } catch (parseError) {
+        console.error("Error parsing LLM response:", parseError);
+        recommendationData = {
+          recommendations: [],
+          userPreferences: {
+            favoriteCuisines: [],
+            pricePreference: "unknown",
+            dietaryPreferences: "unknown",
+          },
+        };
+      }
+
+      // Return the personalized recommendations
+      return res.status(200).json({
+        userId: userId.toString(),
+        ...recommendationData,
+        ordersAnalyzed: userOrders.length,
+      });
+    } catch (dbError) {
+      console.error("Database error:", dbError);
+      return res.status(200).json({
+        message: "Error retrieving order data",
+        error: dbError.message,
+        recommendations: [],
+        userPreferences: {
+          favoriteCuisines: [],
+          pricePreference: "",
+          dietaryPreferences: "",
+        },
+      });
+    }
+  } catch (error) {
+    console.error("Error generating personalized recommendations:", error);
+    return res.status(200).json({
+      message: "Failed to generate personalized recommendations",
+      error: error.message,
+      recommendations: [],
+      userPreferences: {
+        favoriteCuisines: [],
+        pricePreference: "",
+        dietaryPreferences: "",
+      },
+    });
+  }
+});
+
 export {
   processModelInference,
   generateMenuItemDescription,
   searchRestaurantsWithLLM,
+  getPersonalizedRecommendations,
 };
