@@ -6,6 +6,11 @@ import cors from "cors";
 dotenv.config();
 import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
 import connectDb from "./config/db.js";
+import {
+  testConnection as testElasticConnection,
+  elasticClient,
+  isElasticsearchAvailable,
+} from "./config/elasticSearch.js";
 //routes
 import userRoutes from "./routes/userRoutes.js";
 import homeRoutes from "./routes/homeRoutes.js";
@@ -23,6 +28,42 @@ import adminOrderRoutes from "./routes/admin/adminOrderRoutes.js";
 const port = process.env.PORT || 5000;
 
 connectDb();
+
+// Test Elasticsearch connection
+testElasticConnection()
+  .then((connected) => {
+    if (connected) {
+      console.log("✅ Elasticsearch connection test successful");
+
+      // Only try to create index if connection successful
+      try {
+        elasticClient.indices
+          .exists({ index: "restaurants" })
+          .then((exists) => {
+            if (!exists) {
+              console.log(
+                "🔄 Restaurants index does not exist, will be created on first search"
+              );
+            } else {
+              console.log("✅ Restaurants index exists");
+            }
+          })
+          .catch((err) => {
+            console.warn("⚠️ Could not check if index exists:", err.message);
+          });
+      } catch (error) {
+        console.warn("⚠️ Error accessing Elasticsearch client:", error.message);
+      }
+    } else {
+      console.warn(
+        "⚠️ Elasticsearch connection test failed - search will use MongoDB fallback"
+      );
+    }
+  })
+  .catch((err) => {
+    console.error("❌ Error testing Elasticsearch connection:", err.message);
+    console.warn("⚠️ Search operations will use MongoDB fallback");
+  });
 
 const app = express();
 

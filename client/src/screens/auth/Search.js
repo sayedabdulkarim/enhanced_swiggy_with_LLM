@@ -4,8 +4,12 @@ import { useNavigate } from "react-router-dom";
 import TopRestaurantOfferBadge from "../../components/svgs/TopRestaurantOfferBadge";
 import { RestaurantsRatingStar } from "../../utils/svgs";
 import { arrayToString } from "../../utils/commonHelper";
-import { useSearchRestaurantsQuery } from "../../apiSlices/llmApiSlice";
+import {
+  useSearchRestaurantsQuery,
+  useElasticSearchRestaurantsQuery,
+} from "../../apiSlices/llmApiSlice";
 
+// Update the component with better error handling
 const Search = () => {
   //misc
   const navigate = useNavigate();
@@ -13,6 +17,8 @@ const Search = () => {
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const prevQueryRef = useRef("");
   const searchCountRef = useRef(0);
+  const [searchMethod, setSearchMethod] = useState("llm"); // 'llm' or 'elastic'
+  const [elasticSearchStatus, setElasticSearchStatus] = useState("unknown"); // 'available', 'unavailable', 'unknown'
 
   // Get home page data
   const { data: getHomePageData, isLoading: isLoadingHomePage } =
@@ -22,32 +28,64 @@ const Search = () => {
   const allRestaurants = getHomePageData?.data?.allRestaurantsList || [];
 
   // Only skip if no query or no restaurants
-  const shouldSkipSearch = !debouncedQuery || !allRestaurants.length;
+  const shouldSkipLLMSearch =
+    !debouncedQuery || !allRestaurants.length || searchMethod !== "llm";
+  const shouldSkipElasticSearch = !debouncedQuery || searchMethod !== "elastic";
 
   // LLM search API with improved skip logic
   const {
     data: llmSearchResults,
     isLoading: isLLMSearchLoading,
     error: llmSearchError,
-    isFetching: isSearchFetching,
+    isFetching: isLLMSearchFetching,
   } = useSearchRestaurantsQuery(
     {
       query: debouncedQuery,
       restaurants: allRestaurants,
-      requestId: searchCountRef.current,
+      requestId: `llm-${searchCountRef.current}`,
     },
     {
-      skip: shouldSkipSearch,
+      skip: shouldSkipLLMSearch,
       refetchOnMountOrArgChange: true,
     }
   );
 
+  // Elasticsearch API query
+  const {
+    data: elasticSearchResults,
+    isLoading: isElasticSearchLoading,
+    error: elasticSearchError,
+    isFetching: isElasticSearchFetching,
+  } = useElasticSearchRestaurantsQuery(
+    {
+      query: debouncedQuery,
+      requestId: `elastic-${searchCountRef.current}`,
+    },
+    {
+      skip: shouldSkipElasticSearch,
+      refetchOnMountOrArgChange: true,
+    }
+  );
+
+  // Determine current search results based on selected method
+  const currentSearchResults =
+    searchMethod === "llm" ? llmSearchResults : elasticSearchResults;
+  const isSearchLoading =
+    searchMethod === "llm" ? isLLMSearchLoading : isElasticSearchLoading;
+  const isSearchFetching =
+    searchMethod === "llm" ? isLLMSearchFetching : isElasticSearchFetching;
+  const searchError =
+    searchMethod === "llm" ? llmSearchError : elasticSearchError;
+
   // Improved console logging
   useEffect(() => {
-    if (llmSearchError) {
-      console.error("Search API error:", llmSearchError);
+    if (searchError) {
+      console.error(
+        `${searchMethod.toUpperCase()} Search API error:`,
+        searchError
+      );
     }
-  }, [llmSearchError]);
+  }, [searchError, searchMethod]);
 
   // Debounce search input with a simpler approach
   useEffect(() => {
@@ -72,16 +110,106 @@ const Search = () => {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
+  // Add effect to check Elasticsearch availability on search method change
+  useEffect(() => {
+    if (searchMethod === "elastic" && elasticSearchStatus === "unknown") {
+      // Make a simple test query
+      fetch("/api/llm/elastic-search", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ query: "test", requestId: "status-check" }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("Elasticsearch status check:", data);
+
+          // If the response indicates MongoDB fallback was used, Elasticsearch is unavailable
+          if (data.searchMethod === "mongodb-fallback") {
+            setElasticSearchStatus("unavailable");
+            console.warn(
+              "Elasticsearch is unavailable, using MongoDB fallback"
+            );
+          } else {
+            setElasticSearchStatus("available");
+            console.log("Elasticsearch is available");
+          }
+        })
+        .catch((err) => {
+          console.error("Elasticsearch status check error:", err);
+          setElasticSearchStatus("unavailable");
+        });
+    }
+  }, [searchMethod, elasticSearchStatus]);
+
+  // Update the effect to check Elasticsearch availability immediately on component mount
+  useEffect(() => {
+    if (elasticSearchStatus === "unknown") {
+      // Make a simple test query to check Elasticsearch availability on component mount
+      fetch("/api/llm/elastic-search", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ query: "test", requestId: "status-check" }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("Elasticsearch status check:", data);
+
+          // If the response indicates MongoDB fallback was used, Elasticsearch is unavailable
+          if (data.searchMethod === "mongodb-fallback") {
+            setElasticSearchStatus("unavailable");
+            // If the user had selected Elasticsearch but it's unavailable, show a notification
+            if (searchMethod === "elastic") {
+              // Could add a toast notification here if you have a notification system
+              console.warn(
+                "Elasticsearch is unavailable, using MongoDB fallback"
+              );
+            }
+          } else {
+            setElasticSearchStatus("available");
+            console.log("Elasticsearch is available");
+          }
+        })
+        .catch((err) => {
+          console.error("Elasticsearch status check error:", err);
+          setElasticSearchStatus("unavailable");
+        });
+    }
+
+    // Also check when search method changes to elastic
+    if (searchMethod === "elastic" && elasticSearchStatus === "unavailable") {
+      // Could show a more prominent notification here
+      console.warn("User selected Elasticsearch but it's unavailable");
+    }
+  }, [searchMethod, elasticSearchStatus]);
+
   // Choose which restaurants to display
   const displayRestaurants =
-    searchQuery && llmSearchResults?.results
-      ? llmSearchResults.results
+    searchQuery && currentSearchResults?.results
+      ? currentSearchResults.results
       : getHomePageData?.data?.allRestaurantsList || [];
 
   // Handle navigation
   const handleNavigation = (name, id) => {
     navigate(`/restaurant/${name}/${id}`);
   };
+
+  // Handle search method change
+  const handleSearchMethodChange = (e) => {
+    setSearchMethod(e.target.value);
+    if (debouncedQuery) {
+      // Reset search counter to force new search
+      searchCountRef.current += 1;
+      console.log(`Switched search method to ${e.target.value}`);
+    }
+  };
+
+  // Show a warning if elastic search is selected but unavailable
+  const showElasticsearchWarning =
+    searchMethod === "elastic" && elasticSearchStatus === "unavailable";
 
   return (
     <div className="home_best_offers home_all_restaurants">
@@ -95,14 +223,20 @@ const Search = () => {
           width: "100%",
         }}
       >
-        <div style={{ marginBottom: "15px" }}>
+        <div
+          style={{
+            marginBottom: "15px",
+            display: "flex",
+            gap: "10px",
+          }}
+        >
           <input
             type="text"
             placeholder="Ask anything about restaurants or food... e.g Find me a good South Indian restaurant under ₹500"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{
-              width: "100%",
+              flex: 1,
               padding: "12px 20px",
               fontSize: "16px",
               borderRadius: "8px",
@@ -110,7 +244,61 @@ const Search = () => {
               boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
             }}
           />
+
+          {/* Search Method Selector with visual indicator when Elasticsearch is unavailable */}
+          <select
+            value={searchMethod}
+            onChange={handleSearchMethodChange}
+            style={{
+              padding: "12px 15px",
+              fontSize: "16px",
+              borderRadius: "8px",
+              border:
+                elasticSearchStatus === "unavailable" &&
+                searchMethod === "elastic"
+                  ? "1px solid #f5c2c7"
+                  : "1px solid #ddd",
+              boxShadow:
+                elasticSearchStatus === "unavailable" &&
+                searchMethod === "elastic"
+                  ? "0 2px 5px rgba(220,53,69,0.2)"
+                  : "0 2px 5px rgba(0,0,0,0.1)",
+              background:
+                elasticSearchStatus === "unavailable" &&
+                searchMethod === "elastic"
+                  ? "#fff8f8"
+                  : "#fff",
+              cursor: "pointer",
+            }}
+          >
+            <option value="llm">AI Search</option>
+            <option value="elastic">
+              {elasticSearchStatus === "unavailable"
+                ? "Elasticsearch (Unavailable)"
+                : "Elasticsearch"}
+            </option>
+          </select>
         </div>
+
+        {/* Elasticsearch warning notice - Make it more informative */}
+        {showElasticsearchWarning && (
+          <div
+            style={{
+              marginBottom: "10px",
+              padding: "8px 12px",
+              color: "#856404",
+              backgroundColor: "#fff3cd",
+              border: "1px solid #ffeeba",
+              borderRadius: "4px",
+              fontSize: "14px",
+            }}
+          >
+            <strong>Notice:</strong> Elasticsearch is currently unavailable.
+            Using MongoDB fallback instead. Your search will still work, but for
+            optimal search performance, please make sure Elasticsearch is
+            properly configured and running.
+          </div>
+        )}
 
         <div
           style={{
@@ -119,15 +307,27 @@ const Search = () => {
             color: "#686b78",
           }}
         >
-          {isLLMSearchLoading
-            ? "Searching with AI..."
-            : llmSearchError
-            ? `Error: Could not perform AI search - ${
-                llmSearchError.message || "Unknown error"
+          {isSearchLoading
+            ? `Searching with ${
+                searchMethod === "llm"
+                  ? "AI"
+                  : elasticSearchStatus === "unavailable"
+                  ? "MongoDB (fallback)"
+                  : "Elasticsearch"
+              }...`
+            : searchError
+            ? `Error: Could not perform search - ${
+                searchError.message || "Unknown error"
               }`
             : searchQuery
-            ? `AI found ${
-                llmSearchResults?.resultsCount || 0
+            ? `${
+                searchMethod === "llm"
+                  ? "AI"
+                  : currentSearchResults?.searchMethod === "mongodb-fallback"
+                  ? "MongoDB (fallback)"
+                  : "Elasticsearch"
+              } found ${
+                currentSearchResults?.resultsCount || 0
               } matches for "${searchQuery}"`
             : "Try asking for cuisine types, dietary preferences, or specific dishes"}
         </div>
@@ -148,7 +348,7 @@ const Search = () => {
                   margin: "0 auto",
                 }}
               >
-                {isLLMSearchLoading && searchQuery ? (
+                {isSearchLoading && searchQuery ? (
                   <div
                     style={{
                       gridColumn: "span 4",
@@ -156,7 +356,9 @@ const Search = () => {
                       padding: "50px 0",
                     }}
                   >
-                    Searching with AI, please wait...
+                    Searching with{" "}
+                    {searchMethod === "llm" ? "AI" : "Elasticsearch"}, please
+                    wait...
                   </div>
                 ) : (
                   displayRestaurants?.map((item, index) => {
