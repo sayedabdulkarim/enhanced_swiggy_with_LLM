@@ -148,25 +148,31 @@ const Recommendation = () => {
             <p style={{ color: "#ffa700", fontWeight: "500" }}>
               Discover new favorites based on what you already love!
             </p>
-            <br />
-            {userPreferences.favoriteCuisines?.length > 0 && (
-              <p>
+
+            {userPreferences?.favoriteCuisines?.length > 0 && (
+              <p style={{ marginTop: "15px", marginBottom: "10px" }}>
                 <strong>Your favorite cuisines:</strong>{" "}
                 {userPreferences.favoriteCuisines.join(", ")}
               </p>
             )}
-            {userPreferences.pricePreference && (
-              <p>
+
+            {userPreferences?.pricePreference && (
+              <p style={{ marginTop: "10px", marginBottom: "10px" }}>
                 <strong>Price preference:</strong>{" "}
                 {userPreferences.pricePreference}
               </p>
             )}
-            {userPreferences.dietaryPreferences && (
-              <p>
+
+            {userPreferences?.dietaryPreferences &&
+            userPreferences?.dietaryPreferences?.length ? (
+              <p
+                style={{ marginTop: "10px", marginBottom: "10px" }}
+                onClick={() => console.log(userPreferences)}
+              >
                 <strong>Dietary preference:</strong>{" "}
                 {userPreferences.dietaryPreferences}
               </p>
-            )}
+            ) : null}
           </div>
         )}
       </div>
@@ -332,8 +338,9 @@ const Recommendation = () => {
                           {recommendationReason && (
                             <div
                               style={{
-                                marginTop: "10px",
-                                padding: "8px",
+                                marginTop: "12px",
+                                marginBottom: "8px",
+                                padding: "10px",
                                 backgroundColor: "#f9f9f9",
                                 borderRadius: "4px",
                                 fontSize: "14px",
