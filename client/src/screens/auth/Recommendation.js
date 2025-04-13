@@ -106,7 +106,10 @@ const Recommendation = () => {
   };
 
   return (
-    <div className="home_best_offers home_all_restaurants">
+    <div
+      className="home_best_offers home_all_restaurants"
+      style={{ marginBottom: 50 }}
+    >
       {/* Recommendations Header */}
       <div
         className="recommendations-header"
@@ -136,8 +139,16 @@ const Recommendation = () => {
           <div style={{ marginBottom: "20px" }}>
             <p>
               Based on your previous orders, we think you'll love these
-              restaurants!
+              restaurants! Our recommendations are tailored to match your taste
+              preferences and ordering patterns. We've analyzed your order
+              history to find restaurants that align with your favorite flavors
+              and dining experiences.
             </p>
+            <br />
+            <p style={{ color: "#ffa700", fontWeight: "500" }}>
+              Discover new favorites based on what you already love!
+            </p>
+            <br />
             {userPreferences.favoriteCuisines?.length > 0 && (
               <p>
                 <strong>Your favorite cuisines:</strong>{" "}
