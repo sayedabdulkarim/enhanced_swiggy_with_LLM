@@ -78,6 +78,69 @@ const submitReview = asyncHandler(async (req, res) => {
   if (rating) updateData.rating = rating;
   if (review) updateData.review = review;
 
+  // Generate LLM response and sentiment analysis
+  let llmResponse = "";
+  let sentiment = "neutral";
+
+  try {
+    // Create a prompt for the LLM
+    const prompt = `
+    You are a restaurant customer service AI. 
+    A customer has given the following ${rating ? `rating (${rating}/5)` : ""} 
+    ${review ? `and review: "${review}"` : ""}
+    
+    1. Analyze if this review is positive, negative, or neutral.
+    2. Generate a brief, personalized response thanking them for positive feedback or apologizing for any issues if negative.
+    
+    Respond with JSON in this exact format:
+    {
+      "sentiment": "positive|negative|neutral",
+      "response": "Your personalized response message here"
+    }
+    `;
+
+    // Call the LLM service
+    const llmResult = await fetch("http://localhost:11434/api/generate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "llama3.2:1b",
+        prompt: prompt,
+        stream: false,
+      }),
+    });
+
+    if (!llmResult.ok) {
+      throw new Error(`LLM service error: ${llmResult.status}`);
+    }
+
+    const data = await llmResult.json();
+
+    // Parse the JSON response from the LLM
+    try {
+      const parsedResponse = JSON.parse(data.response);
+      sentiment = parsedResponse.sentiment;
+      llmResponse = parsedResponse.response;
+
+      // Add sentiment to the update data
+      updateData.sentiment = sentiment;
+    } catch (parseError) {
+      console.error("Error parsing LLM response:", parseError);
+      // Fallback response
+      sentiment = rating && rating > 3 ? "positive" : "neutral";
+      llmResponse = "Thank you for your feedback!";
+      updateData.sentiment = sentiment;
+    }
+  } catch (llmError) {
+    console.error("Error calling LLM service:", llmError);
+    // Fallback response if LLM call fails
+    sentiment = rating && rating > 3 ? "positive" : "neutral";
+    llmResponse = "Thank you for your feedback!";
+    updateData.sentiment = sentiment;
+  }
+
   // Set the updated time
   updateData.updatedAt = Date.now();
 
@@ -87,7 +150,8 @@ const submitReview = asyncHandler(async (req, res) => {
 
   res.status(200).json({
     success: true,
-    message: "Review submitted successfully",
+    message: llmResponse,
+    sentiment: sentiment,
     order: updatedOrder,
   });
 });

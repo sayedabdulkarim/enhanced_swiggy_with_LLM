@@ -63,6 +63,11 @@ const cartSchema = new mongoose.Schema({
   review: {
     type: String,
   },
+  sentiment: {
+    type: String,
+    enum: ["positive", "negative", "neutral"],
+    default: "neutral",
+  },
   createdAt: {
     type: Date,
     default: Date.now,
