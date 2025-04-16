@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import OrderDetailsDrawerComponent from "../../../drawer/CustomDrawer";
 import OrderDetailsDrawerContent from "./OrderDetailsDrawerContent";
@@ -19,12 +19,22 @@ const Orders = () => {
   const [reviewText, setReviewText] = useState("");
   const [aiResponse, setAiResponse] = useState("");
   const [hasSubmittedReview, setHasSubmittedReview] = useState(false);
+  const [userOrderDetailsState, setUserOrderDetailsState] = useState([]);
 
   // API mutation hook
   const [submitReview, { isLoading: isSubmittingReview }] =
     useSubmitReviewMutation();
 
   const homePageData = useSelector((state) => state.homeReducer.homePageData);
+
+  // Initialize userOrderDetailsState from the Redux store
+  // Moved before any conditional returns to satisfy React hooks rules
+  useEffect(() => {
+    if (homePageData?.data?.userOrderDetails) {
+      setUserOrderDetailsState(homePageData.data.userOrderDetails);
+    }
+  }, [homePageData?.data?.userOrderDetails]);
+
   // Check if userInfo is available
   if (
     !homePageData ||
@@ -91,6 +101,16 @@ const Orders = () => {
       // Update current order for review with the new data
       if (response.order) {
         setCurrentOrderForReview(response.order);
+        // Set the review text from the response
+        setReviewRating(response.order.rating || reviewRating);
+        setReviewText(response.order.review || reviewText);
+
+        // Update the order in userOrderDetailsState array
+        setUserOrderDetailsState((prevOrders) =>
+          prevOrders.map((order) =>
+            order._id === response.order._id ? response.order : order
+          )
+        );
       }
     } catch (error) {
       message.error(error?.data?.message || "Failed to submit review");
@@ -108,7 +128,7 @@ const Orders = () => {
         Past Orders{" "}
       </div>
       {/*  */}
-      {userOrderDetails?.map((item, idx) => {
+      {userOrderDetailsState?.map((item, idx) => {
         const { _id, createdAt, items, restaurantId, finalCost, status } = item;
         return (
           <div className="order_detail_item" key={_id}>
