@@ -68,6 +68,9 @@ const cartSchema = new mongoose.Schema({
     enum: ["positive", "negative", "neutral"],
     default: "neutral",
   },
+  llmResponse: {
+    type: String,
+  },
   createdAt: {
     type: Date,
     default: Date.now,

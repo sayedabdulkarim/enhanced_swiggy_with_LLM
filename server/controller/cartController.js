@@ -126,12 +126,15 @@ const submitReview = asyncHandler(async (req, res) => {
 
       // Add sentiment to the update data
       updateData.sentiment = sentiment;
+      // Add LLM response to the update data
+      updateData.llmResponse = llmResponse;
     } catch (parseError) {
       console.error("Error parsing LLM response:", parseError);
       // Fallback response
       sentiment = rating && rating > 3 ? "positive" : "neutral";
       llmResponse = "Thank you for your feedback!";
       updateData.sentiment = sentiment;
+      updateData.llmResponse = llmResponse;
     }
   } catch (llmError) {
     console.error("Error calling LLM service:", llmError);
@@ -139,6 +142,7 @@ const submitReview = asyncHandler(async (req, res) => {
     sentiment = rating && rating > 3 ? "positive" : "neutral";
     llmResponse = "Thank you for your feedback!";
     updateData.sentiment = sentiment;
+    updateData.llmResponse = llmResponse;
   }
 
   // Set the updated time

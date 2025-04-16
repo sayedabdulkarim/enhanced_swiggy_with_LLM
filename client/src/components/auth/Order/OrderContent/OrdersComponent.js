@@ -75,8 +75,8 @@ const Orders = () => {
           review: reviewText,
         },
       }).unwrap();
-
-      message.success("Review submitted successfully");
+      console.log(response, " resss");
+      message.success(response?.message || "Review submitted successfully");
       handleReviewCancel();
       // You might want to refresh the orders list here
     } catch (error) {
