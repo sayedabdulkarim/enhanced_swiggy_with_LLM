@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import OrderDetailsDrawerComponent from "../../../drawer/CustomDrawer";
 import OrderDetailsDrawerContent from "./OrderDetailsDrawerContent";
-import { Button, Modal, Rate, Input, message } from "antd";
+import { Button, Modal, Rate, Input, message, Alert } from "antd";
 import { useSubmitReviewMutation } from "../../../../apiSlices/cartApiSlice";
 import {
   formatUTCToLocal,
@@ -17,6 +17,8 @@ const Orders = () => {
   const [currentOrderForReview, setCurrentOrderForReview] = useState(null);
   const [reviewRating, setReviewRating] = useState(0);
   const [reviewText, setReviewText] = useState("");
+  const [aiResponse, setAiResponse] = useState("");
+  const [hasSubmittedReview, setHasSubmittedReview] = useState(false);
 
   // API mutation hook
   const [submitReview, { isLoading: isSubmittingReview }] =
@@ -51,6 +53,8 @@ const Orders = () => {
     setCurrentOrderForReview(order);
     setReviewRating(order.rating || 0);
     setReviewText(order.review || "");
+    setAiResponse("");
+    setHasSubmittedReview(false);
     setIsReviewModalVisible(true);
   };
 
@@ -59,6 +63,8 @@ const Orders = () => {
     setCurrentOrderForReview(null);
     setReviewRating(0);
     setReviewText("");
+    setAiResponse("");
+    setHasSubmittedReview(false);
   };
 
   const handleReviewSubmit = async () => {
@@ -75,10 +81,17 @@ const Orders = () => {
           review: reviewText,
         },
       }).unwrap();
-      console.log(response, " resss");
-      message.success(response?.message || "Review submitted successfully");
-      handleReviewCancel();
-      // You might want to refresh the orders list here
+
+      message.success("Review submitted successfully");
+
+      // Update the state but don't close the modal
+      setHasSubmittedReview(true);
+      setAiResponse(response?.message || "");
+
+      // Update current order for review with the new data
+      if (response.order) {
+        setCurrentOrderForReview(response.order);
+      }
     } catch (error) {
       message.error(error?.data?.message || "Failed to submit review");
       console.error(error);
@@ -194,21 +207,36 @@ const Orders = () => {
         onCancel={handleReviewCancel}
         footer={[
           <Button key="back" onClick={handleReviewCancel}>
-            Cancel
+            Close
           </Button>,
           <Button
             key="submit"
             type="primary"
             loading={isSubmittingReview}
             onClick={handleReviewSubmit}
+            disabled={hasSubmittedReview}
           >
             Submit Review
           </Button>,
         ]}
       >
+        {aiResponse && (
+          <Alert
+            message="AI Response"
+            description={aiResponse}
+            type="success"
+            showIcon
+            style={{ marginBottom: 16 }}
+          />
+        )}
         <div style={{ marginBottom: 16 }}>
           <p>Rate your experience:</p>
-          <Rate allowHalf value={reviewRating} onChange={setReviewRating} />
+          <Rate
+            allowHalf
+            value={reviewRating}
+            onChange={setReviewRating}
+            disabled={hasSubmittedReview}
+          />
         </div>
         <div>
           <p>Share your thoughts:</p>
@@ -217,6 +245,7 @@ const Orders = () => {
             value={reviewText}
             onChange={(e) => setReviewText(e.target.value)}
             placeholder="Tell us about your experience..."
+            disabled={hasSubmittedReview}
           />
         </div>
       </Modal>
