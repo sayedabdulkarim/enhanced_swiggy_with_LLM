@@ -27,10 +27,17 @@ const AppHeader = () => {
     }
   };
 
+  const handleDashboard = () => {
+    navigate("/dashboard");
+  };
+
   const content = (
     <Menu>
       <Menu.Item key="logout" onClick={() => handleLogout()}>
         Logout
+      </Menu.Item>
+      <Menu.Item key="dashboard" onClick={() => handleDashboard()}>
+        Dashboard
       </Menu.Item>
     </Menu>
   );

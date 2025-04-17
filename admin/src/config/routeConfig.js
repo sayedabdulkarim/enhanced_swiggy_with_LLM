@@ -12,6 +12,7 @@ import PublicRoute from "../components/PublicRoute";
 import HomeScreen from "../screens/auth/Home";
 import AddRestaurantScreen from "../screens/auth/AddRestaurant";
 import AddMenuScreen from "../screens/auth/AddMenu";
+import DashboardScreen from "../screens/auth/Dashboard";
 //unauth
 import UnAuthScreen from "../screens/unauth";
 
@@ -27,6 +28,7 @@ export const router = createBrowserRouter(
         <Route index={true} path="/" element={<HomeScreen />} />
         <Route path="restaurant" element={<AddRestaurantScreen />} />
         <Route path="addmenu" element={<AddMenuScreen />} />
+        <Route path="dashboard" element={<DashboardScreen />} />
       </Route>
       <Route path="*" element={<h1>404 Component</h1>} />
     </Route>

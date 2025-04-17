@@ -75,4 +75,91 @@ const updateOrderItemStatus = asyncHandler(async (req, res) => {
   });
 });
 
-export { getOrdersDetailsFromRestaurantId, updateOrderItemStatus };
+// @desc    Get all order reviews and LLM analysis for a restaurant
+// @route   GET /api/admin/order-reviews/:restaurantId
+// @access  Private
+const getRestaurantReviewsAnalysis = asyncHandler(async (req, res) => {
+  try {
+    const { restaurantId } = req.params;
+
+    // Find all completed orders for the restaurant with reviews
+    const orderReviews = await CartModal.find({
+      restaurantId,
+      status: { $in: ["completed", "accept"] },
+      review: { $exists: true, $ne: null },
+    }).select("review sentiment llmResponse rating createdAt");
+
+    if (orderReviews.length === 0) {
+      return res.status(200).json({
+        message: "No reviews found for this restaurant",
+        reviews: [],
+        analysis: "No reviews available to analyze.",
+      });
+    }
+
+    // Process reviews for LLM analysis
+    const reviewsData = orderReviews.map((order) => ({
+      review: order.review,
+      sentiment: order.sentiment || "neutral",
+      rating: order.rating || "not provided",
+      date: order.createdAt,
+    }));
+
+    // Create prompt for LLM to analyze reviews
+    const prompt = `You are a restaurant analytics expert.
+Analyze these customer reviews for a restaurant:
+${JSON.stringify(reviewsData, null, 2)}
+
+Create a concise, insightful analysis in bullet point format covering:
+• Overall sentiment trend
+• Common positive feedback
+• Common negative feedback
+• Areas for improvement
+• Standout features of the restaurant
+• Any pattern in ratings over time
+
+Format your response with bullet points (•) for easy reading. Keep your analysis professional, actionable and under 300 words.`;
+
+    // Call the LLM for analysis
+    const response = await fetch("http://localhost:11434/api/generate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "llama3.2:1b",
+        prompt: prompt,
+        stream: false,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const analysisText = data.response;
+
+    // Return both the raw reviews and the analysis
+    res.status(200).json({
+      message: "Reviews retrieved successfully",
+      reviewsCount: orderReviews.length,
+      reviews: orderReviews,
+      analysis: analysisText,
+    });
+  } catch (error) {
+    console.error("Error retrieving restaurant reviews:", error);
+    res.status(500).json({
+      message: "Failed to get restaurant reviews analysis",
+      error: error.message,
+    });
+  }
+});
+
+// code here
+
+export {
+  getOrdersDetailsFromRestaurantId,
+  updateOrderItemStatus,
+  getRestaurantReviewsAnalysis,
+};
