@@ -16,10 +16,17 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
         body: payload,
       }),
     }),
+    getRestaurantReviews: builder.query({
+      query: (restaurantId) => ({
+        url: `${USERS_URL}/order-reviews/${restaurantId}`,
+      }),
+      providesTags: ["Reviews"],
+    }),
   }),
 });
 
 export const {
   useGetOrdersDetailsFromRestaurantIdQuery,
   useUpdateOrderItemStatusMutation,
+  useGetRestaurantReviewsQuery,
 } = ordersApiSlice;
