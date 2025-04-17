@@ -69,7 +69,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div style={{ padding: "24px" }}>
+    <div style={{ padding: "24px", marginTop: 70 }}>
       <Title level={2}>Restaurant Dashboard</Title>
       <Text>Welcome, {restaurantDetails.name}</Text>
 
