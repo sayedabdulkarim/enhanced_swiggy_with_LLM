@@ -77,6 +77,8 @@ const Search = () => {
   const searchError =
     searchMethod === "llm" ? llmSearchError : elasticSearchError;
 
+  const isLoading = isLLMSearchFetching || isElasticSearchFetching;
+
   // Improved console logging
   useEffect(() => {
     if (searchError) {
@@ -285,7 +287,7 @@ const Search = () => {
             color: "#686b78",
           }}
         >
-          {isSearchLoading
+          {isLoading
             ? `Searching with ${
                 searchMethod === "llm"
                   ? "AI"
