@@ -259,13 +259,11 @@ const Search = () => {
                   ? "1px solid #f5c2c7"
                   : "1px solid #ddd",
               boxShadow:
-                elasticSearchStatus === "unavailable" &&
-                searchMethod === "elastic"
+                elasticSearchStatus === "" && searchMethod === "elastic"
                   ? "0 2px 5px rgba(220,53,69,0.2)"
                   : "0 2px 5px rgba(0,0,0,0.1)",
               background:
-                elasticSearchStatus === "unavailable" &&
-                searchMethod === "elastic"
+                elasticSearchStatus === "" && searchMethod === "elastic"
                   ? "#fff8f8"
                   : "#fff",
               cursor: "pointer",
@@ -274,7 +272,7 @@ const Search = () => {
             <option value="llm">AI Search</option>
             <option value="elastic">
               {elasticSearchStatus === "unavailable"
-                ? "Elasticsearch (Unavailable)"
+                ? "Elasticsearch "
                 : "Elasticsearch"}
             </option>
           </select>
@@ -328,17 +326,42 @@ const Search = () => {
                   margin: "0 auto",
                 }}
               >
-                {isSearchLoading && searchQuery ? (
+                {isLLMSearchFetching || isElasticSearchFetching ? (
                   <div
                     style={{
                       gridColumn: "span 4",
                       textAlign: "center",
                       padding: "50px 0",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      gap: "15px",
                     }}
                   >
-                    Searching with{" "}
-                    {searchMethod === "llm" ? "AI" : "Elasticsearch"}, please
-                    wait...
+                    <div
+                      className="loading-spinner-large"
+                      style={{
+                        width: "50px",
+                        height: "50px",
+                        border: "5px solid rgba(0, 0, 0, 0.1)",
+                        borderLeft: "5px solid #fc8019",
+                        borderRadius: "50%",
+                        animation: "spin 1s linear infinite",
+                      }}
+                    ></div>
+                    <div>
+                      Searching with{" "}
+                      <span style={{ fontWeight: "bold", color: "#fc8019" }}>
+                        {searchMethod === "llm" ? "AI" : "Elasticsearch"}
+                      </span>
+                      , please wait...
+                    </div>
+                    <style>{`
+              @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+              }
+            `}</style>
                   </div>
                 ) : (
                   displayRestaurants?.map((item, index) => {
