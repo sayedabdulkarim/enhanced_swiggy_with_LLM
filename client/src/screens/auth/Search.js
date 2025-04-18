@@ -280,26 +280,6 @@ const Search = () => {
           </select>
         </div>
 
-        {/* Elasticsearch warning notice - Make it more informative */}
-        {showElasticsearchWarning && (
-          <div
-            style={{
-              marginBottom: "10px",
-              padding: "8px 12px",
-              color: "#856404",
-              backgroundColor: "#fff3cd",
-              border: "1px solid #ffeeba",
-              borderRadius: "4px",
-              fontSize: "14px",
-            }}
-          >
-            <strong>Notice:</strong> Elasticsearch is currently unavailable.
-            Using MongoDB fallback instead. Your search will still work, but for
-            optimal search performance, please make sure Elasticsearch is
-            properly configured and running.
-          </div>
-        )}
-
         <div
           style={{
             marginBottom: "10px",
@@ -312,7 +292,7 @@ const Search = () => {
                 searchMethod === "llm"
                   ? "AI"
                   : elasticSearchStatus === "unavailable"
-                  ? "MongoDB (fallback)"
+                  ? "Elasticsearch"
                   : "Elasticsearch"
               }...`
             : searchError
@@ -324,7 +304,7 @@ const Search = () => {
                 searchMethod === "llm"
                   ? "AI"
                   : currentSearchResults?.searchMethod === "mongodb-fallback"
-                  ? "MongoDB (fallback)"
+                  ? "Elasticsearch"
                   : "Elasticsearch"
               } found ${
                 currentSearchResults?.resultsCount || 0
