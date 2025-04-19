@@ -6,11 +6,7 @@ import cors from "cors";
 dotenv.config();
 import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
 import connectDb from "./config/db.js";
-import {
-  testConnection as testElasticConnection,
-  elasticClient,
-  isElasticsearchAvailable,
-} from "./config/elasticSearch.js";
+
 //routes
 import userRoutes from "./routes/userRoutes.js";
 import homeRoutes from "./routes/homeRoutes.js";
@@ -29,50 +25,9 @@ const port = process.env.PORT || 5000;
 
 connectDb();
 
-// Test Elasticsearch connection
-testElasticConnection()
-  .then((connected) => {
-    if (connected) {
-      console.log("✅ Elasticsearch connection test successful");
-
-      // Only try to create index if connection successful
-      try {
-        elasticClient.indices
-          .exists({ index: "restaurants" })
-          .then((exists) => {
-            if (!exists) {
-              console.log(
-                "🔄 Restaurants index does not exist, will be created on first search"
-              );
-            } else {
-              console.log("✅ Restaurants index exists");
-            }
-          })
-          .catch((err) => {
-            console.warn("⚠️ Could not check if index exists:", err.message);
-          });
-      } catch (error) {
-        console.warn("⚠️ Error accessing Elasticsearch client:", error.message);
-      }
-    } else {
-      console.warn(
-        "⚠️ Elasticsearch connection test failed - search will use MongoDB fallback"
-      );
-    }
-  })
-  .catch((err) => {
-    console.error("❌ Error testing Elasticsearch connection:", err.message);
-    console.warn("⚠️ Search operations will use MongoDB fallback");
-  });
-
 const app = express();
 
-//
-// Increase the limit for parsed data (JSON)
-app.use(express.json({ limit: "50mb" })); // Adjust '50mb' as needed
-// Increase the limit for parsed data (URL-encoded)
-app.use(express.urlencoded({ limit: "50mb", extended: true })); // Adjust '50mb' as needed
-
+// CORS middleware setup (before routes)
 const corsOptions = {
   origin: [
     "http://localhost:3000",
@@ -83,10 +38,17 @@ const corsOptions = {
   credentials: true, // <-- REQUIRED backend setting
 };
 
-app.use(cors(corsOptions));
+app.use(cors(corsOptions)); // This should be before routes
+
+// Handling OPTIONS request for preflight requests
 app.options("*", cors(corsOptions)); // This will handle all preflight requests
 
-// app.use(cors());
+// Increase the limit for parsed data (JSON)
+app.use(express.json({ limit: "50mb" }));
+// Increase the limit for parsed data (URL-encoded)
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
+
+// Cookie parser
 app.use(cookieParser());
 
 //test
@@ -114,7 +76,6 @@ app.use("/api/admin", adminMenuRoutes);
 app.use("/api/admin", adminOrderRoutes);
 
 ////////////DEPLOYMENT //////////////
-
 const __dirname1 = path.resolve();
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname1, "../client/build")));
