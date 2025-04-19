@@ -32,21 +32,23 @@ app.use(express.json({ limit: "50mb" })); // Adjust '50mb' as needed
 // Increase the limit for parsed data (URL-encoded)
 app.use(express.urlencoded({ limit: "50mb", extended: true })); // Adjust '50mb' as needed
 
+app.use(cookieParser());
+
 const corsOptions = {
-  origin: [
-    "http://localhost:3000",
-    "http://localhost:3001",
-    "https://food-delivery-ab.vercel.app",
-    "https://food-delivery-admin-one.vercel.app",
-  ], // Client's URL, not the server's
+  origin: (origin, callback) => {
+    const allowedOrigins = ["http://localhost:3000", "http://localhost:3001"];
+    if (allowedOrigins.includes(origin)) {
+      callback(null, origin);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true, // <-- REQUIRED backend setting
+  credentials: true,
 };
 
 app.use(cors(corsOptions));
-
-// app.use(cors());
-app.use(cookieParser());
+app.options("*", cors(corsOptions)); // Handle preflight requests
 
 //test
 app.get("/", (req, res) => {
