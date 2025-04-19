@@ -53,6 +53,65 @@ const processModelInference = asyncHandler(async (req, res) => {
 // @desc    Generate menu item description from features
 // @route   POST /api/llm/generate-description
 // @access  Public
+// const generateMenuItemDescription = asyncHandler(async (req, res) => {
+//   try {
+//     const { features } = req.body;
+
+//     if (!features || typeof features !== "string" || features.trim() === "") {
+//       return res.status(400).json({
+//         message:
+//           "Please provide features/keywords as a string in the request body",
+//       });
+//     }
+
+//     // Use the features string directly in the prompt
+//     const featuresString = features.trim();
+
+//     // Create a prompt for the LLM to generate a menu item description
+//     const prompt = `You are a professional food writer specializing in compelling menu descriptions.
+// Create an engaging and appetizing description for a menu item with these features/keywords: ${featuresString}.
+// The description should be between 25-50 words, be persuasive, highlight the unique selling points,
+// and make the dish sound appealing to customers.
+// Return ONLY the description text without any additional commentary or formatting.`;
+
+//     // Call the LLM inference using fetch
+//     const response = await fetch("http://localhost:11434/api/generate", {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: JSON.stringify({
+//         model: "llama3.2:1b",
+//         prompt: prompt,
+//         stream: false,
+//       }),
+//     });
+
+//     if (!response.ok) {
+//       throw new Error(`HTTP error! Status: ${response.status}`);
+//     }
+
+//     const data = await response.json();
+
+//     // Extract the generated description
+//     const generatedDescription = data.response.trim();
+
+//     // Return the generated description
+//     res.status(200).json({
+//       features: featuresString,
+//       description: generatedDescription,
+//       model: "llama3.2:1b",
+//     });
+//   } catch (error) {
+//     console.error("Error generating menu item description:", error);
+//     res.status(500).json({
+//       message: "Failed to generate description",
+//       error: error.message,
+//     });
+//   }
+// });
+
+//with replicate
 const generateMenuItemDescription = asyncHandler(async (req, res) => {
   try {
     const { features } = req.body;
@@ -64,43 +123,48 @@ const generateMenuItemDescription = asyncHandler(async (req, res) => {
       });
     }
 
-    // Use the features string directly in the prompt
     const featuresString = features.trim();
 
-    // Create a prompt for the LLM to generate a menu item description
     const prompt = `You are a professional food writer specializing in compelling menu descriptions.
 Create an engaging and appetizing description for a menu item with these features/keywords: ${featuresString}.
 The description should be between 25-50 words, be persuasive, highlight the unique selling points, 
 and make the dish sound appealing to customers.
 Return ONLY the description text without any additional commentary or formatting.`;
 
-    // Call the LLM inference using fetch
-    const response = await fetch("http://localhost:11434/api/generate", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "llama3.2:1b",
-        prompt: prompt,
-        stream: false,
-      }),
-    });
+    const replicateRes = await fetch(
+      "https://api.replicate.com/v1/models/meta/meta-llama-3-8b-instruct/predictions",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${process.env.REPLICATE_API_TOKEN}`,
+          "Content-Type": "application/json",
+          Prefer: "wait", // waits for completion before responding
+        },
+        body: JSON.stringify({
+          input: {
+            prompt: prompt,
+            temperature: 0.7,
+            max_new_tokens: 100,
+          },
+        }),
+      }
+    );
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
+    if (!replicateRes.ok) {
+      throw new Error(`Replicate API error! Status: ${replicateRes.status}`);
     }
 
-    const data = await response.json();
+    const replicateData = await replicateRes.json();
 
-    // Extract the generated description
-    const generatedDescription = data.response.trim();
+    const rawOutput = replicateData.output;
+    const generatedDescription = Array.isArray(rawOutput)
+      ? rawOutput.join("").replace(/```/g, "").trim()
+      : rawOutput;
 
-    // Return the generated description
     res.status(200).json({
       features: featuresString,
       description: generatedDescription,
-      model: "llama3.2:1b",
+      model: "meta-llama-3-8b-instruct",
     });
   } catch (error) {
     console.error("Error generating menu item description:", error);
