@@ -250,5 +250,4 @@ export {
   getOrdersDetailsFromRestaurantId,
   updateOrderItemStatus,
   getRestaurantReviewsAnalysis,
-  getRestaurantReviewsAnalysis2, // Export the new method
 };
