@@ -178,6 +178,135 @@ Return ONLY the description text without any additional commentary or formatting
 // @desc    Search restaurants using LLM
 // @route   POST /api/llm/search-restaurants
 // @access  Public
+// const searchRestaurantsWithLLM = asyncHandler(async (req, res) => {
+//   try {
+//     const { query, restaurants: providedRestaurants, requestId } = req.body;
+
+//     if (!query) {
+//       return res.status(400).json({ message: "Query parameter is required" });
+//     }
+
+//     console.log(`Processing search request for: "${query}" (ID: ${requestId})`);
+
+//     // Use provided restaurants or fetch from database
+//     let allRestaurants;
+//     if (providedRestaurants && Array.isArray(providedRestaurants)) {
+//       allRestaurants = providedRestaurants;
+//       console.log(`Using ${providedRestaurants.length} provided restaurants`);
+//     } else {
+//       // Fetch restaurants from database
+//       console.log("Fetching restaurants from database");
+//       allRestaurants = await AllRestaurantsModal.find({});
+//     }
+
+//     if (!allRestaurants || allRestaurants.length === 0) {
+//       return res.status(404).json({ message: "No restaurants found" });
+//     }
+
+//     // Filter only needed fields for LLM processing
+//     const simplifiedRestaurants = allRestaurants.map((restaurant) => ({
+//       areaName: restaurant.areaName,
+//       avgRating: restaurant.avgRating,
+//       costForTwo: restaurant.costForTwo,
+//       cuisines: restaurant.cuisines,
+//       name: restaurant.name,
+//       veg: restaurant.veg,
+//     }));
+
+//     // Create a prompt for the LLM
+//     const prompt = `You are a restaurant search assistant.
+// Based on the user's query: "${query}", find the most relevant restaurants from this list:
+// ${JSON.stringify(simplifiedRestaurants, null, 2)}
+
+// Return ONLY a JSON object that contains an array of restaurant names that match the query, in this format:
+// { "matchingRestaurants": ["Restaurant Name 1", "Restaurant Name 2"] }
+// Do not include any other text in your response.`;
+
+//     // Call the LLM inference using fetch (reusing existing approach)
+//     const response = await fetch("http://localhost:11434/api/generate", {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: JSON.stringify({
+//         model: "llama3.2:1b",
+//         prompt: prompt,
+//         stream: false,
+//       }),
+//     });
+
+//     if (!response.ok) {
+//       throw new Error(`HTTP error! Status: ${response.status}`);
+//     }
+
+//     const data = await response.json();
+//     const responseText = data.response;
+
+//     // Parse the LLM response to get matching restaurant names
+//     let matchingNames = [];
+//     try {
+//       // Find JSON content between curly braces
+//       const jsonMatch = responseText.match(/\{[\\s\S]*\}/);
+
+//       if (jsonMatch) {
+//         const parsedJson = JSON.parse(jsonMatch[0]);
+//         matchingNames = parsedJson.matchingRestaurants || [];
+//       } else {
+//         throw new Error("Could not parse LLM response");
+//       }
+//     } catch (parseError) {
+//       console.error("Error parsing LLM response:", parseError);
+//     }
+
+//     // Filter restaurants based on the names returned by the LLM
+//     let matchingRestaurants = [];
+//     if (matchingNames && matchingNames.length > 0) {
+//       matchingRestaurants = allRestaurants.filter((restaurant) =>
+//         matchingNames.some(
+//           (name) =>
+//             restaurant.name.toLowerCase().includes(name.toLowerCase()) ||
+//             name.toLowerCase().includes(restaurant.name.toLowerCase())
+//         )
+//       );
+//     }
+
+//     // If still no matches, use a fallback method based on cuisines
+//     if (matchingRestaurants.length === 0) {
+//       const keywords = query.toLowerCase().split(" ");
+
+//       // Check for cuisine-related keywords
+//       const cuisineMatches = allRestaurants.filter(
+//         (restaurant) =>
+//           restaurant.cuisines &&
+//           restaurant.cuisines.some((cuisine) =>
+//             keywords.some((keyword) => cuisine.toLowerCase().includes(keyword))
+//           )
+//       );
+
+//       if (cuisineMatches.length > 0) {
+//         matchingRestaurants = cuisineMatches;
+//       }
+//     }
+
+//     // Return the results along with search metadata
+//     res.status(200).json({
+//       query: query,
+//       results: matchingRestaurants,
+//       resultsCount: matchingRestaurants.length,
+//       llmModel: "llama3.2:1b",
+//     });
+//   } catch (error) {
+//     console.error("Error in LLM-based restaurant search:", error);
+//     res.status(500).json({
+//       message: "Failed to perform LLM-enhanced search",
+//       error: error.message,
+//     });
+//   }
+// });
+
+// @desc    Search restaurants using Replicate LLM API
+// @route   POST /api/llm/search-restaurants2
+// @access  Public
 const searchRestaurantsWithLLM = asyncHandler(async (req, res) => {
   try {
     const { query, restaurants: providedRestaurants, requestId } = req.body;
@@ -203,17 +332,14 @@ const searchRestaurantsWithLLM = asyncHandler(async (req, res) => {
       return res.status(404).json({ message: "No restaurants found" });
     }
 
-    // Filter only needed fields for LLM processing
+    // Filter only needed fields for LLM processing to reduce token usage
     const simplifiedRestaurants = allRestaurants.map((restaurant) => ({
-      areaName: restaurant.areaName,
-      avgRating: restaurant.avgRating,
-      costForTwo: restaurant.costForTwo,
-      cuisines: restaurant.cuisines,
       name: restaurant.name,
+      cuisines: restaurant.cuisines,
       veg: restaurant.veg,
     }));
 
-    // Create a prompt for the LLM
+    // Create a prompt for the Replicate API
     const prompt = `You are a restaurant search assistant. 
 Based on the user's query: "${query}", find the most relevant restaurants from this list:
 ${JSON.stringify(simplifiedRestaurants, null, 2)}
@@ -222,40 +348,50 @@ Return ONLY a JSON object that contains an array of restaurant names that match 
 { "matchingRestaurants": ["Restaurant Name 1", "Restaurant Name 2"] }
 Do not include any other text in your response.`;
 
-    // Call the LLM inference using fetch (reusing existing approach)
-    const response = await fetch("http://localhost:11434/api/generate", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "llama3.2:1b",
-        prompt: prompt,
-        stream: false,
-      }),
-    });
+    // Call the Replicate API for restaurant search
+    const replicateRes = await fetch(
+      "https://api.replicate.com/v1/models/meta/meta-llama-3-8b-instruct/predictions",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${process.env.REPLICATE_API_TOKEN}`,
+          "Content-Type": "application/json",
+          Prefer: "wait", // waits for completion before responding
+        },
+        body: JSON.stringify({
+          input: {
+            prompt: prompt,
+            temperature: 0.7,
+            max_new_tokens: 200, // Adequate for a simple JSON response
+          },
+        }),
+      }
+    );
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
+    if (!replicateRes.ok) {
+      throw new Error(`Replicate API error! Status: ${replicateRes.status}`);
     }
 
-    const data = await response.json();
-    const responseText = data.response;
+    const replicateData = await replicateRes.json();
+    const rawOutput = replicateData.output;
+    const responseText = Array.isArray(rawOutput)
+      ? rawOutput.join("").trim()
+      : rawOutput;
 
     // Parse the LLM response to get matching restaurant names
     let matchingNames = [];
     try {
       // Find JSON content between curly braces
-      const jsonMatch = responseText.match(/\{[\\s\S]*\}/);
+      const jsonMatch = responseText.match(/\{[\s\S]*\}/);
 
       if (jsonMatch) {
         const parsedJson = JSON.parse(jsonMatch[0]);
         matchingNames = parsedJson.matchingRestaurants || [];
       } else {
-        throw new Error("Could not parse LLM response");
+        throw new Error("Could not parse Replicate response");
       }
     } catch (parseError) {
-      console.error("Error parsing LLM response:", parseError);
+      console.error("Error parsing Replicate response:", parseError);
     }
 
     // Filter restaurants based on the names returned by the LLM
@@ -293,12 +429,12 @@ Do not include any other text in your response.`;
       query: query,
       results: matchingRestaurants,
       resultsCount: matchingRestaurants.length,
-      llmModel: "llama3.2:1b",
+      model: "meta-llama-3-8b-instruct",
     });
   } catch (error) {
-    console.error("Error in LLM-based restaurant search:", error);
+    console.error("Error in Replicate-based restaurant search:", error);
     res.status(500).json({
-      message: "Failed to perform LLM-enhanced search",
+      message: "Failed to perform Replicate-enhanced search",
       error: error.message,
     });
   }
