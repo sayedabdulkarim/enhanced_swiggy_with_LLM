@@ -84,6 +84,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+app.options("*", cors(corsOptions)); // This will handle all preflight requests
 
 // app.use(cors());
 app.use(cookieParser());
