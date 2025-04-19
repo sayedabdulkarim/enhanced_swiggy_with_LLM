@@ -34,21 +34,33 @@ app.use(express.urlencoded({ limit: "50mb", extended: true })); // Adjust '50mb'
 
 app.use(cookieParser());
 
+const allowedOrigins = ["http://localhost:3000", "http://localhost:3001"];
+
 const corsOptions = {
-  origin: (origin, callback) => {
-    const allowedOrigins = ["http://localhost:3000", "http://localhost:3001"];
-    if (allowedOrigins.includes(origin)) {
-      callback(null, origin);
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
     } else {
       callback(new Error("Not allowed by CORS"));
     }
   },
-  methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "x-csrf-token"],
 };
 
 app.use(cors(corsOptions));
 app.options("*", cors(corsOptions)); // Handle preflight requests
+
+app.use((req, res, next) => {
+  console.log("👉 Origin hit hua:", req.headers.origin);
+  next();
+});
+
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Credentials", "true");
+  next();
+});
 
 //test
 app.get("/", (req, res) => {
