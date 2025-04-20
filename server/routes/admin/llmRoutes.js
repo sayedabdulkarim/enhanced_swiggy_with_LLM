@@ -7,7 +7,7 @@ import {
   searchRestaurantsWithLLM,
   searchRestaurantsWithElastic,
   getPersonalizedRecommendations,
-} from "../../controller/admin/enhancedLLmController.js";
+} from "../../controller/admin/enhancedLLMController.js";
 
 // Route for model inference
 router.post("/inference", processModelInference);
