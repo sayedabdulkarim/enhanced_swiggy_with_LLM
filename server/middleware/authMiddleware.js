@@ -96,6 +96,7 @@ export const protectedRoutesWithParser = asyncHandler(
   }
 );
 
+//one withCSRF
 // export const protectedAdminRoutesWithParser = asyncHandler(
 //   async (req, res, next) => {
 //     const token = req.cookies.admin_jwt; // JWT token from cookie
@@ -136,40 +137,37 @@ export const protectedRoutesWithParser = asyncHandler(
 //   }
 // );
 
+//wit JWT / no CSRF
 export const protectedAdminRoutesWithParser = asyncHandler(
   async (req, res, next) => {
-    // 🔥 Manual cookie parse for serverless environment (Vercel)
-    const parsedCookies = req.headers.cookie
-      ? cookie.parse(req.headers.cookie)
-      : {};
+    let token;
 
-    const token = parsedCookies.admin_jwt;
-    const csrfToken = parsedCookies["admin_XSRF-TOKEN"];
-    const csrfTokenFromHeader = req.headers["x-csrf-token"];
-
-    if (token && csrfToken && csrfTokenFromHeader) {
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith("Bearer")
+    ) {
       try {
+        token = req.headers.authorization.split(" ")[1];
+
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-        if (csrfToken !== csrfTokenFromHeader) {
-          res.status(403);
-          throw new Error("CSRF token validation failed");
-        }
-
+        // Assuming you have a User model where you can find the user by ID
         req.adminuser = await AdminUserModal.findById(decoded.id).select(
           "-password"
         );
+
         next();
       } catch (error) {
         console.error(error);
         res.status(401);
         throw new Error("Not authorized, token failed");
       }
-    } else {
+    }
+
+    if (!token) {
       res.status(401);
-      throw new Error("Not authorized, token missing or CSRF token missing");
+      throw new Error("Not authorized, no token");
     }
   }
 );
-
 // module.exports = protectedRoutes;

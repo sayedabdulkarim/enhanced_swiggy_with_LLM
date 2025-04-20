@@ -1,3 +1,4 @@
+import jwt from "jsonwebtoken";
 import asyncHandler from "express-async-handler";
 import bcrypt from "bcryptjs";
 //modals
@@ -38,7 +39,11 @@ const adminUserLogin = asyncHandler(async (req, res) => {
     });
 
     // If user is found and password matches, generate a token
-    generateAdminToken(res, user._id);
+    // generateAdminToken(res, user._id);
+    // 🔥 Generate token manually instead of using cookie
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "30d",
+    });
 
     // Respond with user details
     res.status(200).json({
@@ -49,6 +54,7 @@ const adminUserLogin = asyncHandler(async (req, res) => {
         phone: user.phone,
         restaurant: restaurant || null, // Include restaurant details or null if not found
         // Include other user details you want to return
+        token,
       },
       message: "Login successful",
     });
@@ -67,26 +73,24 @@ const adminUserSignUp = asyncHandler(async (req, res) => {
   // Check if the user already exists based on phone
   const existingUser = await AdminUserModal.findOne({ phone });
   if (existingUser) {
-    res.status(400).json({
+    return res.status(400).json({
       message: "User with this phone number already exists. Please Login.",
     });
-    return;
   }
 
   // Check if the user already exists based on email
   const existingEmailUser = await AdminUserModal.findOne({ email });
   if (existingEmailUser) {
-    res.status(400).json({
+    return res.status(400).json({
       message: "User with this email already exists. Please Login.",
     });
-    return;
   }
 
   // Hash password
-  const salt = await bcrypt.genSalt(10); // 10 rounds is a good balance of security and performance
+  const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
 
-  // Create a new user with the hashed password
+  // Create and save the new user
   const newUser = new AdminUserModal({
     name,
     email,
@@ -94,21 +98,24 @@ const adminUserSignUp = asyncHandler(async (req, res) => {
     password: hashedPassword,
   });
 
-  // Save the new user
   const savedUser = await newUser.save();
 
-  // Generate token or handle OTP logic here (if applicable)
-  generateAdminToken(res, savedUser._id);
+  // 🔥 Generate JWT token manually
+  const token = jwt.sign({ id: savedUser._id }, process.env.JWT_SECRET, {
+    expiresIn: "30d",
+  });
 
+  // Respond with user info + token
   res.status(201).json({
-    message: "User registered successfully.",
-    user: {
-      id: savedUser._id,
+    data: {
+      _id: savedUser._id,
       name: savedUser.name,
       email: savedUser.email,
       phone: savedUser.phone,
       restaurant: null,
+      token,
     },
+    message: "User registered successfully.",
   });
 });
 
