@@ -1,35 +1,34 @@
+import jwt from "jsonwebtoken";
 import asyncHandler from "express-async-handler";
 //modals
 import UserModal from "../modals/userModal.js";
-//helpers
-import generateToken from "../utils/generateToken.js";
 
 // @desc authenticated users/ token
 // route POST /api/users/auth
 // @ccess PUBLIC
 const userLogin = asyncHandler(async (req, res) => {
-  const { phone } = req.body; // Expecting phone from the client
+  const { phone } = req.body;
 
-  // Find user by phone number
   const user = await UserModal.findOne({ phone });
 
   if (user) {
-    // If user is found, generate a token (Assuming you're still using token-based authentication)
-    generateToken(res, user._id);
+    // 🔥 Manually generate token (skip cookie-based auth now)
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "30d",
+    });
 
-    // Respond with user details
     res.status(200).json({
       data: {
         _id: user._id,
         name: user.name,
         email: user.email,
         phoneNumber: user.phone,
-        favorites: user.favorites, // Add this line to include the favorites in the response
+        favorites: user.favorites,
+        token, // 👈 include token here
       },
       message: "Login successful",
     });
   } else {
-    // If user is not found, send an error response
     res.status(404).json({ message: "User not found" });
   }
 });
@@ -43,40 +42,38 @@ const userSignUp = asyncHandler(async (req, res) => {
   // Check if the user already exists based on phone
   const existingUser = await UserModal.findOne({ phone });
   if (existingUser) {
-    res.status(400).json({
-      message: "User with this phone number already exists.Please Login.",
+    return res.status(400).json({
+      message: "User with this phone number already exists. Please Login.",
     });
-    return;
   }
 
   // Check if the user already exists based on email
   const existingUserByEmail = await UserModal.findOne({ email });
   if (existingUserByEmail) {
-    res
-      .status(400)
-      .json({ message: "User with this email already exists.Please Login." });
-    return;
+    return res.status(400).json({
+      message: "User with this email already exists. Please Login.",
+    });
   }
 
   // Create a new user
-  const newUser = new UserModal({
-    name,
-    email,
-    phone,
-  });
+  const newUser = new UserModal({ name, email, phone });
+  const savedUser = await newUser.save();
 
-  await newUser.save();
-  // Generate token or handle OTP logic here (if applicable)
-  generateToken(res, newUser._id);
+  // 🔥 Generate token manually (not via cookie)
+  const token = jwt.sign({ id: savedUser._id }, process.env.JWT_SECRET, {
+    expiresIn: "30d",
+  });
 
   res.status(201).json({
     message: "User registered successfully.",
-    user: {
-      name,
-      email,
-      phone,
+    data: {
+      _id: savedUser._id,
+      name: savedUser.name,
+      email: savedUser.email,
+      phone: savedUser.phone,
+      favorites: [],
+      token, // 👈 include token in response
     },
-    // Other user data can go here
   });
 });
 
