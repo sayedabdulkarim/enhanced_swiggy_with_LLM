@@ -1,8 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  userInfo: localStorage.getItem("userInfo")
-    ? JSON.parse(localStorage.getItem("userInfo"))
+  userInfo: localStorage.getItem("clientInfo")
+    ? JSON.parse(localStorage.getItem("clientInfo"))
     : null,
   name: "Hello Auth Slice",
   posts: [],
@@ -15,13 +15,13 @@ const authSlice = createSlice({
     setCredentials: (state, action) => {
       console.log(action.payload, " setCredentialssss");
       state.userInfo = action.payload;
-      localStorage.setItem("userInfo", JSON.stringify(action.payload));
+      localStorage.setItem("clientInfo", JSON.stringify(action.payload));
     },
 
     logOutUser: (state, action) => {
       console.log("logout called");
       state.userInfo = null;
-      localStorage.removeItem("userInfo");
+      localStorage.removeItem("clientInfo");
     },
 
     updateFavorites: (state, action) => {
@@ -31,7 +31,7 @@ const authSlice = createSlice({
           favorites: action.payload,
         };
         // Update localStorage
-        localStorage.setItem("userInfo", JSON.stringify(state.userInfo));
+        localStorage.setItem("clientInfo", JSON.stringify(state.userInfo));
       }
     },
 

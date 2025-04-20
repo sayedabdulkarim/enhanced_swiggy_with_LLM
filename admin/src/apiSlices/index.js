@@ -1,20 +1,20 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import Cookies from "js-cookie";
-
-const getCsrfToken = () => {
-  // set 'XSRF-TOKEN'
-  return Cookies.get("admin_XSRF-TOKEN");
-};
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: "http://localhost:8001/",
-  credentials: "include", // Necessary for cookies to be included
+  // baseUrl: "http://localhost:8001/",
+  baseUrl: "https://swiggy-with-llm-server.vercel.app/",
   prepareHeaders: (headers) => {
-    const csrfToken = getCsrfToken();
-    if (csrfToken) {
-      // Set the CSRF token in the request headers
-      headers.set("x-csrf-token", csrfToken);
+    const userInfoRaw = localStorage.getItem("userInfo");
+
+    if (userInfoRaw) {
+      const userInfo = JSON.parse(userInfoRaw);
+      const token = userInfo?.data?.token;
+
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
+      }
     }
+
     return headers;
   },
 });
