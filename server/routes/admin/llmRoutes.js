@@ -1,13 +1,13 @@
 import express from "express";
+const router = express.Router();
+
 import {
   processModelInference,
   generateMenuItemDescription,
   searchRestaurantsWithLLM,
   searchRestaurantsWithElastic,
   getPersonalizedRecommendations,
-} from "../../controller/admin/enhancedLlmController.js";
-
-const router = express.Router();
+} from "../../controller/admin/enhancedLLmController.js";
 
 // Route for model inference
 router.post("/inference", processModelInference);
