@@ -34,8 +34,6 @@ app.use(express.urlencoded({ limit: "50mb", extended: true })); // Adjust '50mb'
 
 app.use(cookieParser());
 
-const allowedOrigins = ["http://localhost:3000", "http://localhost:3001"];
-
 // const corsOptions = {
 //   origin: function (origin, callback) {
 //     if (!origin || allowedOrigins.includes(origin)) {
@@ -49,15 +47,34 @@ const allowedOrigins = ["http://localhost:3000", "http://localhost:3001"];
 //   allowedHeaders: ["Content-Type", "Authorization", "x-csrf-token"],
 // };
 
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:3001",
+  "https://<your-frontend-vercel>.vercel.app",
+];
+
 const corsOptions = {
-  origin: [
-    "http://localhost:3000",
-    "http://localhost:3001",
-    "https://food-delivery-ab.vercel.app",
-    "https://food-delivery-admin-one.vercel.app",
-  ], // Client's URL, not the server's
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true, // <-- REQUIRED backend setting
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization",
+    "x-csrf-token",
+    "X-Requested-With",
+    "Accept",
+    "Accept-Version",
+    "Content-Length",
+    "Content-MD5",
+    "Date",
+    "X-Api-Version",
+  ],
 };
 
 app.use(cors(corsOptions));
