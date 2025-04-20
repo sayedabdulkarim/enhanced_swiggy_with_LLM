@@ -36,17 +36,28 @@ app.use(cookieParser());
 
 const allowedOrigins = ["http://localhost:3000", "http://localhost:3001"];
 
+// const corsOptions = {
+//   origin: function (origin, callback) {
+//     if (!origin || allowedOrigins.includes(origin)) {
+//       callback(null, true);
+//     } else {
+//       callback(new Error("Not allowed by CORS"));
+//     }
+//   },
+//   credentials: true,
+//   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+//   allowedHeaders: ["Content-Type", "Authorization", "x-csrf-token"],
+// };
+
 const corsOptions = {
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization", "x-csrf-token"],
+  origin: [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "https://food-delivery-ab.vercel.app",
+    "https://food-delivery-admin-one.vercel.app",
+  ], // Client's URL, not the server's
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true, // <-- REQUIRED backend setting
 };
 
 app.use(cors(corsOptions));
