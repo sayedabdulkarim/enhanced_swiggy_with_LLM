@@ -39,26 +39,27 @@ const allowedOrigins = [
   "http://localhost:3001",
   "https://enhanced-swiggy-with-llm-client.vercel.app",
   "https://enhanced-swiggy-with-llm-admin.vercel.app",
-  "https://enhanced-swiggy-with-llm-client-*.vercel.app",
-  "https://enhanced-swiggy-with-llm-admin-*.vercel.app",
+  "https://enhanced-swiggy-with-llm-client-git-main.vercel.app",
+  "https://enhanced-swiggy-with-llm-admin-git-main.vercel.app",
 ];
 
 const corsOptions = {
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+    if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
       console.log("Blocked origin:", origin);
-      callback(null, true); // Change to true to allow all origins temporarily for debugging
-      // callback(new Error('Not allowed by CORS'));
+      // For debugging and development, we'll allow all origins
+      callback(null, true);
     }
   },
   credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
   allowedHeaders: [
     "Content-Type",
     "Authorization",
     "x-csrf-token",
+    "X-CSRF-Token",
     "X-Requested-With",
     "Accept",
     "Accept-Version",
@@ -67,37 +68,54 @@ const corsOptions = {
     "Date",
     "X-Api-Version",
   ],
-  optionsSuccessStatus: 204,
+  exposedHeaders: ["Content-Length", "X-CSRF-Token"],
 };
 
+// Apply CORS middleware first
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions)); // Handle preflight requests
 
-// Add CORS headers to all responses
-app.use((req, res, next) => {
+// Handle OPTIONS requests explicitly
+app.options("*", (req, res) => {
   const origin = req.headers.origin;
-  console.log("👉 Origin hit hua:", origin);
 
-  if (allowedOrigins.indexOf(origin) !== -1) {
+  if (origin && allowedOrigins.includes(origin)) {
     res.setHeader("Access-Control-Allow-Origin", origin);
   } else {
-    // For development purposes, allow all origins
     res.setHeader("Access-Control-Allow-Origin", "*");
   }
 
+  res.setHeader("Access-Control-Allow-Credentials", "true");
   res.setHeader(
     "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, OPTIONS"
+    "GET,POST,PUT,DELETE,OPTIONS,PATCH"
   );
   res.setHeader(
     "Access-Control-Allow-Headers",
-    "Content-Type, Authorization, x-csrf-token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Date, X-Api-Version"
+    "Content-Type,Authorization,x-csrf-token,X-CSRF-Token,X-Requested-With,Accept,Accept-Version,Content-Length,Content-MD5,Date,X-Api-Version"
   );
-  res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.setHeader("Access-Control-Max-Age", "86400");
+  res.status(204).end();
+});
 
-  if (req.method === "OPTIONS") {
-    return res.status(204).end();
+// Additional middleware to ensure CORS headers are set on all responses
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+
+  if (origin && allowedOrigins.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  } else {
+    res.setHeader("Access-Control-Allow-Origin", "*");
   }
+
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET,POST,PUT,DELETE,OPTIONS,PATCH"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Content-Type,Authorization,x-csrf-token,X-CSRF-Token,X-Requested-With,Accept,Accept-Version,Content-Length,Content-MD5,Date,X-Api-Version"
+  );
 
   next();
 });
