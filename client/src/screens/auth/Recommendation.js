@@ -26,6 +26,11 @@ const Recommendation = () => {
     skip: !userId, // Skip the API call if userId is null
   });
 
+  console.log(
+    { isLoadingRecommendations, isFetchingRecommendations },
+    " qwerty"
+  );
+
   // Get home page data to access all restaurants
   const { data: homePageData, isLoading: isLoadingHomePage } =
     useGetHomePageDataQuery();
@@ -129,7 +134,31 @@ const Recommendation = () => {
             Please log in to see your personalized recommendations
           </p>
         ) : isLoadingRecommendations || isFetchingRecommendations ? (
-          <p>Loading your personalized recommendations...</p>
+          <>
+            <p>Loading your personalized recommendations...</p>
+            <div style={{ textAlign: "center", margin: "15px 0" }}>
+              <div
+                className="loader"
+                style={{
+                  border: "4px solid #f3f3f3",
+                  borderTop: "4px solid #ffa700",
+                  borderRadius: "50%",
+                  width: "30px",
+                  height: "30px",
+                  animation: "spin 1s linear infinite",
+                  margin: "0 auto",
+                }}
+              />
+              <style>
+                {`
+                    @keyframes spin {
+                      0% { transform: rotate(0deg); }
+                      100% { transform: rotate(360deg); }
+                    }
+                  `}
+              </style>
+            </div>
+          </>
         ) : recommendationsError ? (
           <p style={{ color: "red" }}>
             Error loading recommendations:{" "}
